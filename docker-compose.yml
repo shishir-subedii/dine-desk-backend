@@ -1,16 +1,16 @@
 services:
   postgres:
     image: postgres:15
-    container_name: pql-smart-restro-container
+    container_name: pql-dine-desk-container
     restart: always
     environment:
-      POSTGRES_DB: pql-smart-restro-db
+      POSTGRES_DB: pql-dine-desk-db
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
       - '5432:5432'
     volumes:
-      - pg-smart-restro-v:/var/lib/postgresql/data
+      - pg-dine-desk-v:/var/lib/postgresql/data
 
 volumes:
-  pg-smart-restro-v: 
+  pg-dine-desk-v: 
