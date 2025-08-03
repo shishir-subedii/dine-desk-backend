@@ -1,9 +1,20 @@
-// users/user.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
+} from 'typeorm';
+
+export enum UserRole {
+    USER = 'user',
+    ADMIN = 'admin',
+    SUPERADMIN = 'superadmin',
+}
 
 @Entity('users')
 export class User {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column({ unique: true })
@@ -12,20 +23,27 @@ export class User {
     @Column()
     name: string;
 
-    @Column({ select: false }) //we use select: false to avoid returning password in queries
+    @Column({ select: false })
     password: string;
 
+    // Store tokens if you need multi-session support; otherwise, you can remove this
     @Column('text', { array: true, nullable: true, default: () => 'ARRAY[]::TEXT[]' })
     accessTokens: string[];
 
-
-    //find a better way to handle roles
+    // Use enum for stronger typing
     @Column({
         type: 'enum',
-        enum: ['user', 'admin'],
-        default: 'user',
+        enum: UserRole,
+        default: UserRole.USER,
     })
-    role: 'user' | 'admin';
+    role: UserRole;
+
+    // Future-proofing: link users to restaurants/branches if needed
+    @Column({ nullable: true })
+    restaurantId?: string;
+
+    @Column({ nullable: true })
+    branchId?: string;
 
     @CreateDateColumn()
     createdAt: Date;
