@@ -1,13 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  //Remove console logs on production
+  const isProd = process.env.APP_ENV?.trim() === 'production';
+
+  if (isProd) {
+    Logger.overrideLogger(false);
+    console.log = () => { };
+    console.warn = () => { };
+    console.error = () => { };
+    console.debug = () => { };
+  }
   app.enableCors({
     origin: 'http://localhost:3000'
   })
