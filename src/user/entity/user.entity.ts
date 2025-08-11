@@ -23,7 +23,7 @@ export class User {
     @Column()
     name: string;
 
-    @Column({ select: false })
+    @Column({ select: false, nullable: true })
     password: string;
 
     // Store tokens if you need multi-session support; otherwise, you can remove this
@@ -37,14 +37,7 @@ export class User {
         default: UserRole.USER,
     })
     role: UserRole;
-
-    // Future-proofing: link users to restaurants/branches if needed
-    @Column({ nullable: true })
-    restaurantId?: string;
-
-    @Column({ nullable: true })
-    branchId?: string;
-
+    
     @CreateDateColumn()
     createdAt: Date;
 

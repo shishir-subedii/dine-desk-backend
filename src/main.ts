@@ -28,7 +28,7 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
   const config = new DocumentBuilder()
     .setTitle('Docs for DineDesk application')
-    .setDescription('API documentation for DineDesk application')
+    .setDescription('API documentation for DineDesk application. DineDesk is a multi vendor restaurant management system')
     .setVersion('1.0')
     .addBearerAuth(
       {
