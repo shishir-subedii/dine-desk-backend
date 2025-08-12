@@ -8,6 +8,7 @@ import { JwtmoduleModule } from './common/jwtmodule/jwtmodule.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ValkeyModule } from './valkey/valkey.module';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { APP_GUARD } from '@nestjs/core';
         ],
       }),
     }),
-    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule
+    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, ValkeyModule
   ],
   providers: [
     {
