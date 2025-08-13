@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/entity/user.entity';
-import { UserRole } from 'src/user/entity/user.entity';
+import { UserRole } from 'src/common/enums/auth-roles.enum';
 
 export async function AdminSeeder(dataSource: DataSource) {
     const userRepository = dataSource.getRepository(User);

@@ -25,7 +25,7 @@ import { ValkeyModule } from './valkey/valkey.module';
         ],
       }),
     }),
-    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, ValkeyModule
+    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, // ValkeyModule
   ],
   providers: [
     {
