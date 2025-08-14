@@ -4,6 +4,7 @@ import { ApiOperation, ApiResponse, ApiBearerAuth, ApiBadRequestResponse } from 
 import { JwtAuthGuard } from 'src/common/auth/AuthGuard';
 import { Roles } from 'src/common/auth/AuthRoles';
 import { Request } from 'express';
+import { UserRole } from 'src/common/enums/auth-roles.enum';
 
 @Controller('user')
 export class UserController {
@@ -24,12 +25,11 @@ export class UserController {
     })
     @Get()
     @UseGuards(JwtAuthGuard)
-    @Roles('user', 'admin') 
     async getProfile(@Req() req: Request) {
         const user = req['user'] as { email: string };
         const userProfile = await this.userService.getUserProfile(user.email);
         return {
-            // success: true,
+            success: true,
             message: 'User profile retrieved successfully',
             data: userProfile,
         };
