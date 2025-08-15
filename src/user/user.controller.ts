@@ -5,6 +5,7 @@ import { JwtAuthGuard } from 'src/common/auth/AuthGuard';
 import { Roles } from 'src/common/auth/AuthRoles';
 import { Request } from 'express';
 import { UserRole } from 'src/common/enums/auth-roles.enum';
+import { userPayloadType } from 'src/common/types/auth.types';
 
 @Controller('user')
 export class UserController {
@@ -26,7 +27,7 @@ export class UserController {
     @Get()
     @UseGuards(JwtAuthGuard)
     async getProfile(@Req() req: Request) {
-        const user = req['user'] as { email: string };
+        const user = req['user'] as userPayloadType;
         const userProfile = await this.userService.getUserProfile(user.email);
         return {
             success: true,
