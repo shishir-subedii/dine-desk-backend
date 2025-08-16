@@ -2,9 +2,7 @@ import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiResponse, ApiBearerAuth, ApiBadRequestResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/common/auth/AuthGuard';
-import { Roles } from 'src/common/auth/AuthRoles';
 import { Request } from 'express';
-import { UserRole } from 'src/common/enums/auth-roles.enum';
 import { userPayloadType } from 'src/common/types/auth.types';
 
 @Controller('user')
