@@ -44,7 +44,7 @@ export class UserService {
     }
 
     async findOneByEmail(email: string) {
-        return this.usersRepository.findOne({ where: { email } });
+        return this.usersRepository.findOne({ where: { email }, relations: { restaurantsOwned: true } });
     }
 
     async findCompleteProfileByEmail(email: string) {

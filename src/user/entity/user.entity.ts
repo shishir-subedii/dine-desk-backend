@@ -4,9 +4,11 @@ import {
     PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn,
+    OneToMany,
 } from 'typeorm';
 
 import { UserRole } from 'src/common/enums/auth-roles.enum';
+import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
 
 @Entity('users')
 export class User {
@@ -22,9 +24,11 @@ export class User {
     @Column({ select: false, nullable: true })
     password: string;
 
-    // Store tokens if you need multi-session support; otherwise, you can remove this
     @Column('text', { array: true, nullable: true, default: () => 'ARRAY[]::TEXT[]' })
     accessTokens: string[];
+
+    @OneToMany(() => Restaurant, (restaurant) => restaurant.owner, {nullable: true})
+    restaurantsOwned: Restaurant[];
 
     // Use enum for stronger typing
     @Column({
