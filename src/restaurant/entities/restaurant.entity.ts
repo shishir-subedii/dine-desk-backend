@@ -1,6 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, OneToMany, UpdateDateColumn } from 'typeorm';
 import { User } from 'src/user/entity/user.entity';
-// import { Branch } from 'src/branches/entities/branch.entity';
+import { Branch } from 'src/branch/entities/branch.entity';
 
 @Entity('restaurants')
 export class Restaurant {
@@ -22,8 +22,8 @@ export class Restaurant {
     @ManyToOne(() => User, (user) => user.restaurantsOwned)
     owner: User;
 
-    // @OneToMany(() => Branch, (branch) => branch.restaurant)
-    // branches: Branch[];
+    @OneToMany(() => Branch, (branch) => branch.restaurant)
+    branches: Branch[];
 
     @CreateDateColumn()
     createdAt: Date;

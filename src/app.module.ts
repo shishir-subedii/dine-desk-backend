@@ -10,6 +10,9 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ValkeyModule } from './valkey/valkey.module';
 import { RestaurantModule } from './restaurant/restaurant.module';
+import { BranchModule } from './branch/branch.module';
+import { PersistenceModule } from './database/persistence/persistence.module';
+import { CoreModule } from './common/core/core.module';
 
 @Module({
   imports: [
@@ -26,7 +29,7 @@ import { RestaurantModule } from './restaurant/restaurant.module';
         ],
       }),
     }),
-    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, // ValkeyModule
+    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, BranchModule, CoreModule, 
   ],
   providers: [
     {
