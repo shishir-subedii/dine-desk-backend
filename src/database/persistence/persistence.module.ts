@@ -2,6 +2,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Branch } from 'src/branch/entities/branch.entity';
+import { MenuItem } from 'src/menu/entities/menu.entity';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
 import { User } from 'src/user/entity/user.entity';
 
@@ -10,7 +11,8 @@ import { User } from 'src/user/entity/user.entity';
         TypeOrmModule.forFeature([
             User,
             Restaurant,
-            Branch
+            Branch,
+            MenuItem
         ]),
     ],
     exports: [TypeOrmModule], // Export so other modules can inject repositories
