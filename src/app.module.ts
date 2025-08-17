@@ -15,6 +15,7 @@ import { PersistenceModule } from './database/persistence/persistence.module';
 import { CoreModule } from './common/core/core.module';
 import { MenuModule } from './menu/menu.module';
 import { OrderModule } from './order/order.module';
+import { DeliveryModule } from './delivery/delivery.module';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { OrderModule } from './order/order.module';
         ],
       }),
     }),
-    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, BranchModule, CoreModule, MenuModule, OrderModule, 
+    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, BranchModule, CoreModule, MenuModule, OrderModule, DeliveryModule, 
   ],
   providers: [
     {

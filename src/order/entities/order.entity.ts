@@ -4,6 +4,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDat
 import { OrderItem } from './order-item.entity';
 import { orderStatus } from 'src/common/enums/order-status.enum';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
+import { Delivery } from 'src/delivery/entities/delivery.entity';
 
 
 @Entity('orders')
@@ -43,8 +44,8 @@ export class Order {
     @Column('decimal', { precision: 10, scale: 7 })
     longitude: number;
 
-    // @OneToMany(() => Delivery, (delivery) => delivery.order)
-    // deliveries: Delivery[];
+    @OneToMany(() => Delivery, (delivery) => delivery.order)
+    deliveries: Delivery[];
 
     @CreateDateColumn()
     createdAt: Date;
