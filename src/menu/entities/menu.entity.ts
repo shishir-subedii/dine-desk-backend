@@ -25,7 +25,9 @@ export class MenuItem {
     @ManyToOne(() => Branch, (branch) => branch.menuItems)
     branch: Branch;
 
+    @Column()
+    sellCount: number;
+
     @ManyToOne(() => Restaurant) 
     restaurant: Restaurant;
-
 }

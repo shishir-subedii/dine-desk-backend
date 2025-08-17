@@ -14,6 +14,7 @@ import { BranchModule } from './branch/branch.module';
 import { PersistenceModule } from './database/persistence/persistence.module';
 import { CoreModule } from './common/core/core.module';
 import { MenuModule } from './menu/menu.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { MenuModule } from './menu/menu.module';
         ],
       }),
     }),
-    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, BranchModule, CoreModule, MenuModule, 
+    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, BranchModule, CoreModule, MenuModule, OrderModule, 
   ],
   providers: [
     {
