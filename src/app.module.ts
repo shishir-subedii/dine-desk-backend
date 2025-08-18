@@ -16,6 +16,7 @@ import { CoreModule } from './common/core/core.module';
 import { MenuModule } from './menu/menu.module';
 import { OrderModule } from './order/order.module';
 import { DeliveryModule } from './delivery/delivery.module';
+import { VoucherModule } from './voucher/voucher.module';
 
 @Module({
   imports: [
@@ -32,7 +33,7 @@ import { DeliveryModule } from './delivery/delivery.module';
         ],
       }),
     }),
-    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, BranchModule, CoreModule, MenuModule, OrderModule, DeliveryModule, 
+    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, BranchModule, CoreModule, MenuModule, OrderModule, DeliveryModule, VoucherModule, 
   ],
   providers: [
     {
