@@ -18,6 +18,7 @@ import { OrderModule } from './order/order.module';
 import { DeliveryModule } from './delivery/delivery.module';
 import { VoucherModule } from './voucher/voucher.module';
 import { PaymentModule } from './payment/payment.module';
+import { ApplicationModule } from './application/application.module';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { PaymentModule } from './payment/payment.module';
         ],
       }),
     }),
-    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, BranchModule, CoreModule, MenuModule, OrderModule, DeliveryModule, VoucherModule, PaymentModule, 
+    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, BranchModule, CoreModule, MenuModule, OrderModule, DeliveryModule, VoucherModule, PaymentModule, ApplicationModule, 
   ],
   providers: [
     {

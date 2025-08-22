@@ -1,6 +1,7 @@
 // src/database/database.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Application } from 'src/application/entities/application.entity';
 import { Branch } from 'src/branch/entities/branch.entity';
 import { Delivery } from 'src/delivery/entities/delivery.entity';
 import { MenuItem } from 'src/menu/entities/menu.entity';
@@ -22,7 +23,8 @@ import { Voucher } from 'src/voucher/entities/voucher.entity';
             OrderItem,
             Delivery,
             Voucher, 
-            Payment
+            Payment,
+            Application
         ]),
     ],
     exports: [TypeOrmModule], // Export so other modules can inject repositories
