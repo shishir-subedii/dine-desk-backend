@@ -44,6 +44,9 @@ export class MenuItem {
     @Column({ type: 'timestamp', nullable: true })
     discountValidUntil: Date;
 
+    @Column()
+    discountCap: number;
+
     @CreateDateColumn()
     createdAt: Date;
 

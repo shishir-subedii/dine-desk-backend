@@ -8,7 +8,7 @@ export class Delivery {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(() => Order, (order) => order.deliveries)
+    @ManyToOne(() => Order, (order) => order.delivery)
     order: Order;
 
     //pickup time

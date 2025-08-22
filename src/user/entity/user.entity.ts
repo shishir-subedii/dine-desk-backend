@@ -18,7 +18,7 @@ export class User {
     @Column({ unique: true })
     email: string;
 
-    @Column()
+    @Column({ nullable: true })
     name: string;
 
     @Column({ select: false, nullable: true })
@@ -27,8 +27,11 @@ export class User {
     @Column('text', { array: true, nullable: true, default: () => 'ARRAY[]::TEXT[]' })
     accessTokens: string[];
 
-    @OneToMany(() => Restaurant, (restaurant) => restaurant.owner, {nullable: true})
+    @OneToMany(() => Restaurant, (restaurant) => restaurant.owner, { nullable: true })
     restaurantsOwned: Restaurant[];
+
+    @Column({nullable: true})
+    phoneNumber: string;
 
     // Use enum for stronger typing
     @Column({
@@ -37,7 +40,7 @@ export class User {
         default: UserRole.USER,
     })
     role: UserRole;
-    
+
     @CreateDateColumn()
     createdAt: Date;
 

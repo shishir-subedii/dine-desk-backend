@@ -5,6 +5,8 @@ import { OrderItem } from './order-item.entity';
 import { orderStatus } from 'src/common/enums/order-status.enum';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
 import { Delivery } from 'src/delivery/entities/delivery.entity';
+import { Voucher } from 'src/voucher/entities/voucher.entity';
+import { Payment } from 'src/payment/entities/payment.entity';
 
 
 @Entity('orders')
@@ -21,11 +23,23 @@ export class Order {
     @ManyToOne(() => Branch)
     branch: Branch;
 
+    @Column()
+    phoneNumber: string;
+
     @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
     items: OrderItem[];
 
     @Column('decimal', { precision: 10, scale: 2 })
-    totalAmount: number;
+    subtotal: number;  // total before discounts
+
+    @Column('decimal', { precision: 10, scale: 2, default: 0 })
+    discountAmount: number; // total discount applied (voucher + menu discounts)
+
+    @Column('decimal', { precision: 10, scale: 2 })
+    total: number; // after discount
+
+    @ManyToOne(() => Voucher, {nullable: true})
+    voucher: Voucher;
 
     @Column({
         type: 'enum',
@@ -45,12 +59,15 @@ export class Order {
     longitude: number;
 
     @OneToMany(() => Delivery, (delivery) => delivery.order)
-    deliveries: Delivery[];
+    delivery: Delivery;
 
-    @CreateDateColumn()
-    createdAt: Date;
+    @ManyToOne(() => Payment, (payment) => payment.order)
+    payment: Payment;
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @CreateDateColumn()
+    createdAt: Date;
 }
 
