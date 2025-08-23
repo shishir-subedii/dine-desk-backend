@@ -1,6 +1,14 @@
 import { Branch } from 'src/branch/entities/branch.entity';
 import { User } from 'src/user/entity/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    ManyToOne,
+    OneToMany,
+    CreateDateColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 import { OrderItem } from './order-item.entity';
 import { orderStatus } from 'src/common/enums/order-status.enum';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
@@ -8,29 +16,28 @@ import { Delivery } from 'src/delivery/entities/delivery.entity';
 import { Voucher } from 'src/voucher/entities/voucher.entity';
 import { Payment } from 'src/payment/entities/payment.entity';
 
-
 @Entity('orders')
 export class Order {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { nullable: false })
     customer: User;
 
-    @ManyToOne(() => Restaurant)
+    @ManyToOne(() => Restaurant, { nullable: false })
     restaurant: Restaurant;
 
-    @ManyToOne(() => Branch)
+    @ManyToOne(() => Branch, { nullable: false })
     branch: Branch;
 
-    @Column()
+    @Column({ type: 'varchar' })
     phoneNumber: string;
 
     @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
     items: OrderItem[];
 
     @Column('decimal', { precision: 10, scale: 2 })
-    subtotal: number;  // total before discounts
+    subtotal: number; // total before discounts
 
     @Column('decimal', { precision: 10, scale: 2, default: 0 })
     discountAmount: number; // total discount applied (voucher + menu discounts)
@@ -38,15 +45,15 @@ export class Order {
     @Column('decimal', { precision: 10, scale: 2 })
     total: number; // after discount
 
-    @ManyToOne(() => Voucher, {nullable: true})
-    voucher: Voucher;
+    @ManyToOne(() => Voucher, { nullable: true })
+    voucher: Voucher | null;
 
     @Column({
         type: 'enum',
         enum: orderStatus,
-        default: orderStatus.PENDING
+        default: orderStatus.PENDING,
     })
-    status: orderStatus
+    status: orderStatus;
 
     // --- Address fields ---
     @Column({ type: 'varchar', length: 255 })
@@ -60,14 +67,13 @@ export class Order {
 
     @OneToMany(() => Delivery, (delivery) => delivery.order)
     delivery: Delivery;
-
-    @ManyToOne(() => Payment, (payment) => payment.order)
+    
+    @ManyToOne(() => Payment, (payment) => payment.order, { nullable: false })
     payment: Payment;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;
 }
-

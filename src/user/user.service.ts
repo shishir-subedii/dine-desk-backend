@@ -17,6 +17,11 @@ export class UserService {
         private usersRepository: Repository<User>,
     ) { }
 
+    async generateOtp(): Promise<string> {
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        return otp;
+    }
+
     async register(userData: UserRegisterDto) {
         const existingUser = await this.findOneByEmail(userData.email);
         if (existingUser) {
@@ -25,18 +30,57 @@ export class UserService {
 
         const hashedPassword = await bcrypt.hash(userData.password, 10);
 
+        const otp = await this.generateOtp();
+
         const newUser = this.usersRepository.create({
             name: userData.name,
             email: userData.email,
             password: hashedPassword,
             accessTokens: [], // initialize empty token list
+            otp, 
+            otpExpiry: new Date(Date.now() + 10 * 60000), // 10 minutes from now
+            isVerified: false
         });
 
         return await this.usersRepository.save(newUser);
     }
 
+    async verifySignupOtp(email: string, otp: string) {
+        const user = await this.findOneByEmail(email);
+        if (!user) {
+            throw new BadRequestException('User not found');
+        }
+        if (user.otp !== otp) {
+            throw new BadRequestException('Invalid OTP');
+        }
+        if (!user.otpExpiry || user.otpExpiry < new Date()) {
+            throw new BadRequestException('OTP expired');
+        }
+
+        user.isVerified = true;
+        user.otp = null;
+        user.otpExpiry = null;
+        await this.usersRepository.save(user);
+        return true;
+    }
+
     async findAll() {
         return this.usersRepository.find();
+    }
+
+    async findVerifiedUsers() {
+        return this.usersRepository.find({ where: { isVerified: true } });
+    }
+
+    async checkVerificationStatus(email: string) {
+        const user = await this.findOneByEmail(email);
+        if (!user) {
+            throw new BadRequestException('User not found');
+        }
+        if(user.isVerified) {
+            return true;
+        }
+        return false;
     }
 
     async findOneById(id: string) {
@@ -99,6 +143,10 @@ export class UserService {
             throw new BadRequestException(
                 'New password and confirm password do not match',
             );
+        }
+
+        if(!user.password) {
+            throw new BadRequestException('User not found');
         }
 
         const isOldPasswordValid = await bcrypt.compare(

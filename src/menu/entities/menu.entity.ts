@@ -1,55 +1,72 @@
 import { Branch } from 'src/branch/entities/branch.entity';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    ManyToOne,
+    CreateDateColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('menu_items')
 export class MenuItem {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     name: string;
 
-    @Column({ nullable: true })
-    description: string;
+    @Column({ type: 'text', nullable: true })
+    description: string | null;
 
     @Column('decimal', { precision: 10, scale: 2 })
     price: number;
 
-    @Column({ nullable: true })
-    imageUrl: string;
+    @Column({ type: 'varchar', nullable: true })
+    imageUrl: string | null;
 
-    @Column({ default: true })
+    @Column({ type: 'boolean', default: true })
     isAvailable: boolean;
 
-    @ManyToOne(() => Branch, (branch) => branch.menuItems)
+    @ManyToOne(() => Branch, (branch) => branch.menuItems, { nullable: false })
     branch: Branch;
 
-    @Column()
+    @Column({ type: 'int', default: 0 })
     sellCount: number;
 
-    @ManyToOne(() => Restaurant) 
+    @ManyToOne(() => Restaurant, { nullable: false })
     restaurant: Restaurant;
 
     // Discount-specific
-    @Column('decimal', { precision: 10, scale: 2, default: 0, nullable: true })
-    discountAmount: number; // Flat discount
+    @Column('decimal', {
+        precision: 10,
+        scale: 2,
+        default: 0,
+        nullable: true,
+    })
+    discountAmount: number | null; // Flat discount
 
-    @Column('decimal', { precision: 5, scale: 2, default: 0, nullable: true })
-    discountPercent: number; // e.g. 15 = 15%
+    @Column('decimal', {
+        precision: 5,
+        scale: 2,
+        default: 0,
+        nullable: true,
+    })
+    discountPercent: number | null; // e.g. 15 = 15%
 
-    @Column({ type: 'timestamp', nullable: true })
-    discountValidFrom: Date;
+    @Column({ type: 'timestamptz', nullable: true })
+    discountValidFrom: Date | null;
 
-    @Column({ type: 'timestamp', nullable: true })
-    discountValidUntil: Date;
+    @Column({ type: 'timestamptz', nullable: true })
+    discountValidUntil: Date | null;
 
-    @Column()
+    @Column({ type: 'int', default: 0 })
     discountCap: number;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;
 }

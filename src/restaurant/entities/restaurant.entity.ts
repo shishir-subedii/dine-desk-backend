@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, OneToMany, UpdateDateColumn } from 'typeorm';
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    ManyToOne,
+    CreateDateColumn,
+    OneToMany,
+    UpdateDateColumn,
+} from 'typeorm';
 import { User } from 'src/user/entity/user.entity';
 import { Branch } from 'src/branch/entities/branch.entity';
 import { Application } from 'src/application/entities/application.entity';
@@ -8,34 +16,34 @@ export class Restaurant {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     name: string;
 
     @ManyToOne(() => Application)
     application: Application;
 
-    @Column({ nullable: true })
-    description: string;
+    @Column({ type: 'text', nullable: true })
+    description: string | null;
 
-    @Column({ nullable: true })
-    logo: string;
+    @Column({ type: 'varchar', nullable: true })
+    logo: string | null;
 
-    @Column()
+    @Column({ type: 'varchar' })
     requiredDocuments: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     registeredCountry: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     registeredAddress: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     companyEmail: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     companyPhone: string;
 
-    @Column({ default: true })
+    @Column({ type: 'boolean', default: true })
     isActive: boolean;
 
     @ManyToOne(() => User, (user) => user.restaurantsOwned)
@@ -44,9 +52,9 @@ export class Restaurant {
     @OneToMany(() => Branch, (branch) => branch.restaurant)
     branches: Branch[];
 
-    @CreateDateColumn()
+    @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;
 }
