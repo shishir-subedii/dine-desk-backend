@@ -8,10 +8,8 @@ import { JwtmoduleModule } from './common/jwtmodule/jwtmodule.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
-import { ValkeyModule } from './valkey/valkey.module';
 import { RestaurantModule } from './restaurant/restaurant.module';
 import { BranchModule } from './branch/branch.module';
-import { PersistenceModule } from './database/persistence/persistence.module';
 import { CoreModule } from './common/core/core.module';
 import { MenuModule } from './menu/menu.module';
 import { OrderModule } from './order/order.module';
@@ -19,6 +17,7 @@ import { DeliveryModule } from './delivery/delivery.module';
 import { VoucherModule } from './voucher/voucher.module';
 import { PaymentModule } from './payment/payment.module';
 import { ApplicationModule } from './application/application.module';
+import { MailModule } from './common/mail/mail.module';
 
 @Module({
   imports: [
@@ -35,7 +34,7 @@ import { ApplicationModule } from './application/application.module';
         ],
       }),
     }),
-    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, BranchModule, CoreModule, MenuModule, OrderModule, DeliveryModule, VoucherModule, PaymentModule, ApplicationModule, 
+    DatabaseModule, UsersModule, AuthModule, AppConfigModule, JwtmoduleModule, RestaurantModule, BranchModule, CoreModule, MenuModule, OrderModule, DeliveryModule, VoucherModule, PaymentModule, ApplicationModule, MailModule, 
   ],
   providers: [
     {
