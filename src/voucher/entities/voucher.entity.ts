@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
 
 @Entity('vouchers')
@@ -6,27 +6,33 @@ export class Voucher {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     code: string; // e.g. SAVE10
 
     @Column('decimal', { precision: 10, scale: 2, nullable: true })
-    discountAmount: number; // Flat discount
+    discountAmount: number | null; // Flat discount
 
     @Column('decimal', { precision: 5, scale: 2, nullable: true })
-    discountPercent: number; // e.g. 10 means 10%
+    discountPercent: number | null; // e.g. 10 means 10%
 
     @Column('decimal', { precision: 10, scale: 2, nullable: true })
-    discountCap: number; // Flat discount
+    discountCap: number | null; // Max discount allowed
 
-    @Column({ type: 'timestamp', nullable: true })
-    validFrom: Date;
+    @Column({ type: 'timestamptz', nullable: true })
+    validFrom: Date | null;
 
-    @Column({ type: 'timestamp', nullable: true })
-    validUntil: Date;
+    @Column({ type: 'timestamptz', nullable: true })
+    validUntil: Date | null;
 
-    @Column({ default: true })
+    @Column({ type: 'boolean', default: true })
     isActive: boolean;
 
     @ManyToOne(() => Restaurant)
     restaurant: Restaurant;
+
+    @CreateDateColumn({ type: 'timestamptz' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamptz' })
+    updatedAt: Date;
 }

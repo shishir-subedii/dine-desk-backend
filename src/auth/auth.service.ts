@@ -33,6 +33,10 @@ export class AuthService {
             throw new BadRequestException('Invalid credentials');
         }
 
+        if (!user.password) {
+            throw new BadRequestException('Invalid credentials');
+        }
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             throw new BadRequestException('Invalid credentials');

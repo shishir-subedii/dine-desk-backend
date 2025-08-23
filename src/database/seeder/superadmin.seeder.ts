@@ -17,6 +17,7 @@ export async function AdminSeeder(dataSource: DataSource) {
                 email: 'demo@gmail.com',
                 password: hashedPassword,
                 role: UserRole.SUPERADMIN,
+                isVerified: true
             }),
         );
 

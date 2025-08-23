@@ -15,25 +15,38 @@ export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ unique: true })
+    @Column({ type: 'varchar', unique: true })
     email: string;
 
-    @Column({ nullable: true })
-    name: string;
+    @Column({ type: 'varchar', nullable: true })
+    name: string | null;
 
-    @Column({ select: false, nullable: true })
-    password: string;
+    @Column({ type: 'varchar', select: false, nullable: true })
+    password: string | null;
 
-    @Column('text', { array: true, nullable: true, default: () => 'ARRAY[]::TEXT[]' })
-    accessTokens: string[];
+    @Column({
+        type: 'text',
+        array: true,
+        nullable: true,
+        default: () => 'ARRAY[]::TEXT[]',
+    })
+    accessTokens: string[] | null;
 
-    @OneToMany(() => Restaurant, (restaurant) => restaurant.owner, { nullable: true })
+    @OneToMany(() => Restaurant, (restaurant) => restaurant.owner)
     restaurantsOwned: Restaurant[];
 
-    @Column({nullable: true})
-    phoneNumber: string;
+    @Column({ type: 'varchar', nullable: true })
+    phoneNumber: string | null;
 
-    // Use enum for stronger typing
+    @Column({ type: 'boolean', default: false })
+    isVerified: boolean;
+
+    @Column({ type: 'varchar', nullable: true, select: false })
+    otp: string | null;
+
+    @Column({ type: 'timestamptz', nullable: true })
+    otpExpiry: Date | null;
+
     @Column({
         type: 'enum',
         enum: UserRole,
@@ -41,9 +54,9 @@ export class User {
     })
     role: UserRole;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;
 }

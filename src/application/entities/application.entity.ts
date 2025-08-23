@@ -1,6 +1,13 @@
 import { ApplicationStatus } from 'src/common/enums/application-status.enum';
 import { User } from 'src/user/entity/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    ManyToOne,
+    CreateDateColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('applications')
 export class Application {
@@ -8,48 +15,48 @@ export class Application {
     id: string;
 
     // The user who submitted the application
-    @ManyToOne(() => User, { eager: true })
+    @ManyToOne(() => User, { eager: true, nullable: false })
     applicant: User;
 
     // Business info
-    @Column()
+    @Column({ type: 'varchar' })
     restaurantName: string;
 
-    @Column({ nullable: true })
-    description: string;
+    @Column({ type: 'text', nullable: true })
+    description: string | null;
 
-    @Column({ nullable: true })
-    logo: string; // can store logo even during application
+    @Column({ type: 'varchar', nullable: true })
+    logo: string | null; // can store logo even during application
 
     // Contact info
-    @Column()
+    @Column({ type: 'varchar' })
     contactPersonName: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     contactEmail: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     contactNumber: string;
 
     // Company info (aligns with Restaurant entity)
-    @Column()
+    @Column({ type: 'varchar' })
     registeredCountry: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     registeredAddress: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     companyEmail: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     companyPhone: string;
 
     // City of operation (useful for assigning regional team)
-    @Column()
+    @Column({ type: 'varchar' })
     city: string;
 
     // Legal / compliance
-    @Column()
+    @Column({ type: 'varchar' })
     requiredDocuments: string; // maybe later make it a JSON or relation
 
     // Status tracking
@@ -60,18 +67,18 @@ export class Application {
     })
     status: ApplicationStatus;
 
-    @Column({ nullable: true })
-    reviewedBy: string; // staff ID or name who reviewed
+    @Column({ type: 'varchar', nullable: true })
+    reviewedBy: string | null; // staff ID or name who reviewed
 
-    @Column({ type: 'timestamp', nullable: true })
-    reviewedAt: Date;
+    @Column({ type: 'timestamptz', nullable: true })
+    reviewedAt: Date | null;
 
-    @Column({ nullable: true })
-    rejectionReason: string;
+    @Column({ type: 'text', nullable: true })
+    rejectionReason: string | null;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ type: 'timestamptz' })
     appliedAt: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;
 }
