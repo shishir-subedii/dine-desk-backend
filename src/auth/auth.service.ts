@@ -1,5 +1,7 @@
 import {
     BadRequestException,
+    forwardRef,
+    Inject,
     Injectable,
     InternalServerErrorException,
 } from '@nestjs/common';
@@ -13,7 +15,11 @@ import { loginResponseType } from 'src/common/types/auth.types';
 
 @Injectable()
 export class AuthService {
-    constructor(private userService: UserService, private jwt: JwtService) { }
+    constructor(
+        @Inject(forwardRef(() => UserService))
+        private userService: UserService,
+        private jwt: JwtService
+    ) { }
 
     async register(user: UserRegisterDto) {
         if (user.password !== user.confirmPassword) {

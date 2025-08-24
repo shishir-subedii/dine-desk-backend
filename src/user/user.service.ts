@@ -1,5 +1,7 @@
 import {
     BadRequestException,
+    forwardRef,
+    Inject,
     Injectable,
     InternalServerErrorException,
 } from '@nestjs/common';
@@ -9,12 +11,17 @@ import { User } from './entity/user.entity';
 import { UserRegisterDto } from 'src/auth/dto/UserRegisterDto';
 import * as bcrypt from 'bcrypt';
 import { changePasswordDto } from 'src/auth/dto/ChangePasswordDto';
+import { JwtService } from '@nestjs/jwt';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        private jwtService: JwtService,
+        @Inject(forwardRef(() => AuthService))
+        private authService: AuthService
     ) { }
 
     async generateOtp(): Promise<string> {
@@ -42,11 +49,14 @@ export class UserService {
             isVerified: false
         });
 
-        return await this.usersRepository.save(newUser);
+        const token = await this.authService.genTokens(newUser.id, newUser.email, newUser.role);
+
+        await this.usersRepository.save(newUser);
+        return token;
     }
 
     async verifySignupOtp(email: string, otp: string) {
-        const user = await this.findOneByEmail(email);
+        const user = await this.usersRepository.findOne({ where: { email, isVerified: false } });
         if (!user) {
             throw new BadRequestException('User not found');
         }
@@ -88,7 +98,7 @@ export class UserService {
     }
 
     async findOneByEmail(email: string) {
-        return this.usersRepository.findOne({ where: { email }, relations: { restaurantsOwned: true } });
+        return this.usersRepository.findOne({ where: { email, isVerified: true }, relations: { restaurantsOwned: true } });
     }
 
     async findCompleteProfileByEmail(email: string) {

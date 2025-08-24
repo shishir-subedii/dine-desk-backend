@@ -4,7 +4,6 @@ import { ApiOperation, ApiResponse, ApiBadRequestResponse, ApiBody, ApiParam, Ap
 import { UserRegisterDto } from './dto/UserRegisterDto';
 import { UserLoginDto } from './dto/UserLoginDto';
 import { JwtAuthGuard } from 'src/common/auth/AuthGuard';
-import { Roles } from 'src/common/auth/AuthRoles';
 import { changePasswordDto } from './dto/ChangePasswordDto';
 
 @Controller('auth')
@@ -34,7 +33,7 @@ export class AuthController {
     const user = await this.authService.register(userData);
     return {
       // success: true,
-      message: 'User registered successfully',
+      message: 'Please Verify Your Email',
       data: user,
     };
   }
@@ -80,7 +79,6 @@ export class AuthController {
   })
   @Get('logout')
   @UseGuards(JwtAuthGuard)
-  @Roles('user', 'admin')
   async logout(@Req() req: Request) {
     const user = req['user'] as { email: string };
     const token = req.headers['authorization']?.split(' ')[1]; // Extract Bearer token
@@ -117,7 +115,6 @@ export class AuthController {
   })
   @Post('change-password')
   @UseGuards(JwtAuthGuard)
-  @Roles('user', 'admin')
   async changePassword(@Req() req: Request, @Body() body: changePasswordDto) {
     const user = req['user'] as {email: string};
     const updatedUser = await this.authService.changePassword(user.email, body);
