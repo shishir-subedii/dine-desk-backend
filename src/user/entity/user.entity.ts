@@ -41,7 +41,7 @@ export class User {
     @Column({ type: 'boolean', default: false })
     isVerified: boolean;
 
-    @Column({ type: 'varchar', nullable: true, select: false })
+    @Column({ type: 'varchar', nullable: true })
     otp: string | null;
 
     @Column({ type: 'timestamptz', nullable: true })

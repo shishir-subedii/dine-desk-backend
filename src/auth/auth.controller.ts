@@ -1,10 +1,11 @@
-import { Body, Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiResponse, ApiBadRequestResponse, ApiBody, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { UserRegisterDto } from './dto/UserRegisterDto';
 import { UserLoginDto } from './dto/UserLoginDto';
 import { JwtAuthGuard } from 'src/common/auth/AuthGuard';
 import { changePasswordDto } from './dto/ChangePasswordDto';
+import { VerifyOtpDto } from './dto/VerifyOtp.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -65,6 +66,31 @@ export class AuthController {
       data: responseData
     };
   }
+
+  //verify signup OTP
+  @ApiOperation({ summary: 'Verify signup OTP' })
+  @ApiResponse({
+    status: 200,
+    description: 'OTP verified successfully',
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid OTP',
+  })
+  @ApiBody({
+    type: VerifyOtpDto,
+  })
+  @Post('verify-otp')
+  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
+    const isValid = await this.authService.verifySignupOtp(verifyOtpDto.token, verifyOtpDto.otp);
+    if (!isValid) {
+      throw new BadRequestException('Invalid OTP');
+    }
+    return {
+      // success: true,
+      message: 'OTP verified successfully',
+    };
+  }
+
   /*
   Logout
   */

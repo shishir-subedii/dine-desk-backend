@@ -4,30 +4,31 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailService } from './mail.service';
 import { join } from 'path';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Global()
 @Module({
     imports: [
-        MailerModule.forRoot({
-            transport: {
-                host: process.env.MAIL_HOST,
-                port: parseInt(process.env.MAIL_PORT ?? "587"),
-                secure: false,
-                auth: {
-                    user: process.env.MAIL_USER,
-                    pass: process.env.MAIL_PASS,
+        MailerModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: async (config: ConfigService) => ({
+                transport: {
+                    service: 'gmail',
+                    auth: {
+                        user: config.get<string>('MAIL_USER'),
+                        pass: config.get<string>('MAIL_PASS'),
+                    },
                 },
-            },
-            defaults: {
-                from: `"No Reply" <${process.env.MAIL_FROM}>`,
-            },
-            template: {
-                dir: join(__dirname, 'templates'), 
-                adapter: new HandlebarsAdapter(), 
-                options: {
-                    strict: true,
+                defaults: {
+                    from: `"DineDesk" <${config.get<string>('MAIL_USER')}>`,
                 },
-            },
+                template: {
+                    dir: join(process.cwd(), 'src/common/mail/templates'),
+                    adapter: new HandlebarsAdapter(),
+                    options: { strict: true },
+                },
+            }),
         }),
     ],
     providers: [MailService],

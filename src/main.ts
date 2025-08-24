@@ -19,7 +19,7 @@ async function bootstrap() {
     console.debug = () => { };
   }
   app.enableCors({
-    origin: 'http://localhost:3000'
+    origin: '*'
   })
 
   // Global Pipes

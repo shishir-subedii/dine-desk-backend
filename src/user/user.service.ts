@@ -6,20 +6,21 @@ import {
     InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from './entity/user.entity';
 import { UserRegisterDto } from 'src/auth/dto/UserRegisterDto';
 import * as bcrypt from 'bcrypt';
 import { changePasswordDto } from 'src/auth/dto/ChangePasswordDto';
-import { JwtService } from '@nestjs/jwt';
 import { AuthService } from 'src/auth/auth.service';
+import { MailService } from 'src/common/mail/mail.service';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
-        private jwtService: JwtService,
+        private mailservice: MailService,
+        private dataSource: DataSource,
         @Inject(forwardRef(() => AuthService))
         private authService: AuthService
     ) { }
@@ -29,30 +30,82 @@ export class UserService {
         return otp;
     }
 
+    // async register(userData: UserRegisterDto) {
+    //     const existingUser = await this.findOneByEmail(userData.email);
+    //     if (existingUser) {
+    //         throw new BadRequestException('User with this email already exists');
+    //     }
+
+    //     const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+    //     const otp = await this.generateOtp();
+
+    //     const newUser = this.usersRepository.create({
+    //         name: userData.name,
+    //         email: userData.email,
+    //         password: hashedPassword,
+    //         accessTokens: [], // initialize empty token list
+    //         otp,
+    //         otpExpiry: new Date(Date.now() + 10 * 60000), // 10 minutes from now
+    //         isVerified: false
+    //     });
+
+    //     const { accessToken } = await this.authService.genTokens(newUser.id, newUser.email, newUser.role);
+
+    //     await this.usersRepository.save(newUser);
+    //     await this.mailservice.sendSignupOtp(userData.email, userData.name, otp);
+    //     console.log(accessToken)
+    //     return { tempToken: accessToken };
+    // }
+
     async register(userData: UserRegisterDto) {
-        const existingUser = await this.findOneByEmail(userData.email);
-        if (existingUser) {
-            throw new BadRequestException('User with this email already exists');
-        }
+        return await this.dataSource.transaction(async (manager) => {
+            // 1. Check if user exists
+            const existingUser = await manager.findOne(User, {
+                where: { email: userData.email },
+            });
+            if (existingUser) {
+                throw new BadRequestException('User with this email already exists');
+            }
 
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
+            // 2. Hash password
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-        const otp = await this.generateOtp();
+            // 3. Generate OTP
+            const otp = await this.generateOtp();
 
-        const newUser = this.usersRepository.create({
-            name: userData.name,
-            email: userData.email,
-            password: hashedPassword,
-            accessTokens: [], // initialize empty token list
-            otp, 
-            otpExpiry: new Date(Date.now() + 10 * 60000), // 10 minutes from now
-            isVerified: false
+            // 4. Create user entity
+            const newUser = manager.create(User, {
+                name: userData.name,
+                email: userData.email,
+                password: hashedPassword,
+                accessTokens: [],
+                otp,
+                otpExpiry: new Date(Date.now() + 10 * 60000),
+                isVerified: false,
+            });
+
+            console.log(newUser);
+            // 5. Save user inside transaction
+            
+            const savedUser = await manager.save(User, newUser);
+
+            // 6. Generate token (does not touch DB, safe inside txn)
+            const { accessToken } = await this.authService.genTokens(
+                savedUser.id,
+                savedUser.email,
+                savedUser.role,
+            );
+
+            // 7. Send email ( if this fails, txn rolls back, no user is saved)
+            await this.mailservice.sendSignupOtp(
+                userData.email,
+                userData.name,
+                otp,
+            );
+
+            return { tempToken: accessToken };
         });
-
-        const token = await this.authService.genTokens(newUser.id, newUser.email, newUser.role);
-
-        await this.usersRepository.save(newUser);
-        return token;
     }
 
     async verifySignupOtp(email: string, otp: string) {
@@ -60,6 +113,7 @@ export class UserService {
         if (!user) {
             throw new BadRequestException('User not found');
         }
+        console.log(user.otp, otp);
         if (user.otp !== otp) {
             throw new BadRequestException('Invalid OTP');
         }
@@ -72,6 +126,11 @@ export class UserService {
         user.otpExpiry = null;
         await this.usersRepository.save(user);
         return true;
+    }
+
+    //this will return unverified user as well
+    async findRawUser(email: string) {
+        return this.usersRepository.findOne({ where: { email } });
     }
 
     async findAll() {
@@ -87,7 +146,7 @@ export class UserService {
         if (!user) {
             throw new BadRequestException('User not found');
         }
-        if(user.isVerified) {
+        if (user.isVerified) {
             return true;
         }
         return false;
@@ -155,7 +214,7 @@ export class UserService {
             );
         }
 
-        if(!user.password) {
+        if (!user.password) {
             throw new BadRequestException('User not found');
         }
 
