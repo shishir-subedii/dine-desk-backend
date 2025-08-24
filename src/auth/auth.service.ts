@@ -63,6 +63,15 @@ export class AuthService {
         };
     }
 
+    async verifySignupOtp(token: string, otp: string) {
+        const payload: { id: string; email: string; role: string } =
+            this.jwt.verify(token, {
+                secret: process.env.JWT_ACCESS_SECRET,
+            });
+        return await this.userService.verifySignupOtp(payload.email, otp);
+
+    }
+
     async logout(email: string, token: string) {
         // ✅ Remove only the current token (per-session logout)
         await this.userService.removeAccessToken(email, token);

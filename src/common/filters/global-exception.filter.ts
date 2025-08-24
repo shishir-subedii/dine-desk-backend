@@ -51,7 +51,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         const response = ctx.getResponse<Response>();
         const request = ctx.getRequest<Request>();
 
-        
+        if(process.env.APP_ENV?.trim() !== 'production') {
+            console.error(exception);
+        }
         const status =
         exception instanceof HttpException
         ? exception.getStatus()
