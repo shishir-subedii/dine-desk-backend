@@ -58,6 +58,7 @@ export class UserService {
     //     return { tempToken: accessToken };
     // }
 
+    //TODO: USE KAFKA TO QUEUE THE EMAIL SENDING TASK.
     async register(userData: UserRegisterDto) {
         return await this.dataSource.transaction(async (manager) => {
             // 1. Check if user exists
@@ -65,8 +66,43 @@ export class UserService {
                 where: { email: userData.email },
             });
             if (existingUser) {
-                throw new BadRequestException('User with this email already exists');
+                if (!existingUser.isVerified) {
+                    if (existingUser.otpExpiry) {
+                        const now = new Date();
+                        const otpIssuedAt = new Date(
+                            existingUser.otpExpiry.getTime() - 10 * 60 * 1000
+                        ); // expiry - 10min = issued time
+                        const secondsSinceOtp = (now.getTime() - otpIssuedAt.getTime()) / 1000;
+
+                        if (secondsSinceOtp < 30) {
+                            throw new BadRequestException(
+                                "OTP was just sent. Please check your email before requesting again."
+                            );
+                        }
+                    }
+
+                    // overwrite OTP & expiry
+                    existingUser.otp = await this.generateOtp();
+                    existingUser.otpExpiry = new Date(Date.now() + 10 * 60000);
+                    await manager.save(User, existingUser);
+
+                    await this.mailservice.sendSignupOtp(
+                        existingUser.email,
+                        existingUser.name!,
+                        existingUser.otp,
+                    );
+
+                    const newToken = await this.authService.genTokens(
+                        existingUser.id,
+                        existingUser.email,
+                        existingUser.role,
+                    );
+
+                    return { tempToken: newToken.accessToken, message: "Account exists but not verified. A new OTP has been sent to email" };
+                }
+                throw new BadRequestException('User with this email already exists and is verified');
             }
+
 
             // 2. Hash password
             const hashedPassword = await bcrypt.hash(userData.password, 10);
@@ -85,9 +121,8 @@ export class UserService {
                 isVerified: false,
             });
 
-            console.log(newUser);
             // 5. Save user inside transaction
-            
+
             const savedUser = await manager.save(User, newUser);
 
             // 6. Generate token (does not touch DB, safe inside txn)
@@ -104,7 +139,7 @@ export class UserService {
                 otp,
             );
 
-            return { tempToken: accessToken };
+            return { tempToken: accessToken, message: 'Signup OTP sent successfully. Please check your email.' };
         });
     }
 
@@ -113,7 +148,6 @@ export class UserService {
         if (!user) {
             throw new BadRequestException('User not found');
         }
-        console.log(user.otp, otp);
         if (user.otp !== otp) {
             throw new BadRequestException('Invalid OTP');
         }
@@ -126,6 +160,24 @@ export class UserService {
         user.otpExpiry = null;
         await this.usersRepository.save(user);
         return true;
+    }
+
+    async handleForgotPassword(email: string) {
+        const user = await this.findOneByEmail(email);
+        if (!user) {
+            throw new BadRequestException('User not found');
+        }
+
+        const otp = await this.generateOtp();
+        user.otp = otp;
+        user.otpExpiry = new Date(Date.now() + 10 * 60000);
+        await this.usersRepository.save(user);
+
+        await this.mailservice.sendForgotPasswordOtp(
+            user.email,
+            user.name!,
+            otp,
+        );
     }
 
     //this will return unverified user as well
@@ -169,7 +221,7 @@ export class UserService {
             .getOne();
     }
 
-    // ✅ Add token to user's token array
+    // Add token to user's token array
     async addAccessToken(email: string, newToken: string) {
         const user = await this.findCompleteProfileByEmail(email);
         if (!user) throw new BadRequestException('User not found');
@@ -178,7 +230,7 @@ export class UserService {
         await this.usersRepository.save(user);
     }
 
-    // ✅ Remove a specific token (logout from one device)
+    // Remove a specific token (logout from one device)
     async removeAccessToken(email: string, tokenToRemove: string) {
         const user = await this.findCompleteProfileByEmail(email);
         if (!user) throw new BadRequestException('User not found');
@@ -189,7 +241,7 @@ export class UserService {
         await this.usersRepository.save(user);
     }
 
-    // ✅ Optional: remove all tokens (logout from all devices)
+    // Optional: remove all tokens (logout from all devices)
     async removeAllAccessTokens(email: string) {
         await this.usersRepository.update({ email }, { accessTokens: [] });
     }

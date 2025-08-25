@@ -33,8 +33,8 @@ export class AuthController {
   async register(@Body() userData: UserRegisterDto) {
     const user = await this.authService.register(userData);
     return {
-      // success: true,
-      message: 'Please Verify Your Email',
+      success: true,
+      message: user.message ? user.message : 'Registration successful. Please check your email for verification.',
       data: user,
     };
   }
