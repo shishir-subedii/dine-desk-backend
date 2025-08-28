@@ -5,6 +5,8 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
+import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -21,6 +23,9 @@ async function bootstrap() {
   app.enableCors({
     origin: '*'
   })
+
+  // serve static files from uploads
+  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 
   // Global Pipes
   app.useGlobalPipes(

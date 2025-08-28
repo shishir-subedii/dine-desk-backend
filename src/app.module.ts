@@ -18,6 +18,7 @@ import { VoucherModule } from './voucher/voucher.module';
 import { PaymentModule } from './payment/payment.module';
 import { ApplicationModule } from './application/application.module';
 import { MailModule } from './common/mail/mail.module';
+import { FileUploadModule } from './file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { MailModule } from './common/mail/mail.module';
     PaymentModule,
     ApplicationModule,
     MailModule,
+    FileUploadModule,
   ],
   providers: [
     {
