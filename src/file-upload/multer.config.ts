@@ -1,40 +1,45 @@
 import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { Request } from 'express';
-import * as fs from 'fs';
+import { join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import { BadRequestException } from '@nestjs/common';
+
+// Allowed file types
+const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
 
 export const multerConfig = {
     storage: diskStorage({
-        destination: (req: Request, file: Express.Multer.File, cb) => {
-            const folder = req.body.folder || 'default';
-            const uploadPath = `./uploads/${folder}`;
+        destination: (req, file, cb) => {
+            let folder = req.params?.folder;
 
-            // ensure folder exists
-            fs.mkdirSync(uploadPath, { recursive: true });
+            // fallback: infer from route path (last segment)
+            if (!folder && req.route?.path) {
+                const parts = req.route.path.split('/');
+                folder = parts[parts.length - 1] || 'common';
+            }
+
+            const uploadPath = join(__dirname, '../../uploads', folder);
+
+            if (!existsSync(uploadPath)) {
+                mkdirSync(uploadPath, { recursive: true });
+            }
 
             cb(null, uploadPath);
         },
-        filename: (req: Request, file: Express.Multer.File, cb) => {
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-            cb(null, `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`);
+
+        filename: (req, file, cb) => {
+            const fileName = `${Date.now()}-${file.originalname}`;
+            cb(null, fileName);
         },
     }),
 
-    // 5 MB max file size
     limits: {
-        fileSize: 5 * 1024 * 1024,
+        fileSize: 4 * 1024 * 1024, // 4 MB
     },
 
-    // Allowed file types
-    fileFilter: (req: Request, file: Express.Multer.File, cb: (error: Error | null, acceptFile: boolean) => void) => {
-        const allowedTypes = /jpeg|jpg|png|pdf/; // you can add more
-        const ext = extname(file.originalname).toLowerCase();
-        const mime = file.mimetype;
-
-        if (allowedTypes.test(ext) && allowedTypes.test(mime)) {
-            cb(null, true);
-        } else {
-            cb(new Error('Only .jpg, .jpeg, .png, .pdf files are allowed!'), false);
+    fileFilter: (req, file, cb) => {
+        if (!allowedMimeTypes.includes(file.mimetype)) {
+            return cb(new BadRequestException(`File type not allowed: ${file.mimetype}`), false);
         }
+        cb(null, true);
     },
 };
