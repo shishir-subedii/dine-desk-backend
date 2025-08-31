@@ -2,6 +2,7 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import { BadRequestException } from '@nestjs/common';
+import { MAX_FILE_SIZE } from './file-upload.config';
 
 // Allowed file types
 const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
@@ -33,7 +34,7 @@ export const multerConfig = {
     }),
 
     limits: {
-        fileSize: 4 * 1024 * 1024, // 4 MB
+        fileSize: MAX_FILE_SIZE
     },
 
     fileFilter: (req, file, cb) => {

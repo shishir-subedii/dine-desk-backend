@@ -12,5 +12,3 @@ import { FileuploadController } from './file-upload.controller';
   exports: [FileUploadService, MulterModule], // so other modules can use it
 })
 export class FileUploadModule { }
-
-//TODO: REFACTORY WHOLE FILE UPLOAD MODULE AND SERVICES
