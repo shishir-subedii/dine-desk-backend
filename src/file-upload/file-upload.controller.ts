@@ -18,7 +18,8 @@ import {
     ApiOperation,
 } from '@nestjs/swagger';
 import { MulterExceptionFilter } from 'src/common/filters/multer-exception.filter';
-import { getDiskStorage } from './file-upload.utils';
+import { getDiskStorage, getFileInterceptor } from './file-upload.utils';
+import { UploadFolder } from 'src/common/enums/file-upload.enum';
 
 @ApiTags('File Upload') // groups endpoints in Swagger
 @Controller('file-upload')
@@ -26,7 +27,7 @@ export class FileuploadController {
     constructor(private readonly fileUploadService: FileUploadService) { }
 
     @Post('profile')
-    @UseInterceptors(FileInterceptor('file', { storage: getDiskStorage('profile') })) // auto-uses global config
+    @UseInterceptors(getFileInterceptor(UploadFolder.PROFILE))
     @UseFilters(MulterExceptionFilter) // handles Multer errors
     @ApiConsumes('multipart/form-data')
     @ApiOperation({ summary: 'Upload profile picture' })
@@ -48,7 +49,7 @@ export class FileuploadController {
         @Req() req,
         @Body('userId') userId: string,
     ) {
-        const fileUrl = this.fileUploadService.getFileUrl(req, file, 'profile');
+        const fileUrl = this.fileUploadService.getFileUrl(req, file, UploadFolder.PROFILE);
 
         return {
             success: true,
@@ -66,7 +67,7 @@ export class FileuploadController {
     }
 
     @Post('application')
-    @UseInterceptors(FileInterceptor('file', { storage: getDiskStorage('application') })) // auto-uses global config
+    @UseInterceptors(getFileInterceptor(UploadFolder.APPLICATIONS))
     @UseFilters(MulterExceptionFilter) // handles Multer errors
     @ApiConsumes('multipart/form-data')
     @ApiOperation({ summary: 'Upload application document' })
@@ -88,7 +89,7 @@ export class FileuploadController {
         @Req() req,
         @Body('userId') userId: string,
     ) {
-        const fileUrl = this.fileUploadService.getFileUrl(req, file, 'application');
+        const fileUrl = this.fileUploadService.getFileUrl(req, file, UploadFolder.APPLICATIONS);
 
         return {
             success: true,
