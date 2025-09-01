@@ -4,23 +4,9 @@ import { UpdateApplicationDto } from './dto/update-application.dto';
 
 @Injectable()
 export class ApplicationService {
-  create(createApplicationDto: CreateApplicationDto) {
-    return 'This action adds a new application';
+  async createApplication(createApplicationDto: CreateApplicationDto) {
+    // Logic to create a new application
+    return 'New application created';
   }
-
-  findAll() {
-    return `This action returns all application`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} application`;
-  }
-
-  update(id: number, updateApplicationDto: UpdateApplicationDto) {
-    return `This action updates a #${id} application`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} application`;
-  }
+  
 }
