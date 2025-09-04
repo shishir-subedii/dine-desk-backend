@@ -1,1 +1,1 @@
-Backend for restaurant management system. An ubereats clone(kinda)
+Backend for restaurant management system. An ubereats clone(kinda).
