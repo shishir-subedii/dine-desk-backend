@@ -15,7 +15,7 @@ export class Application {
     id: string;
 
     // The user who submitted the application
-    @ManyToOne(() => User, { eager: true, nullable: false })
+    @ManyToOne(() => User, { nullable: false })
     applicant: User;
 
     // Business info
@@ -25,8 +25,8 @@ export class Application {
     @Column({ type: 'text', nullable: true })
     description: string | null;
 
-    @Column({ type: 'varchar', nullable: true })
-    logo: string | null; // can store logo even during application
+    @Column({ type: 'varchar' })
+    logo: string; // can store logo even during application
 
     // Contact info
     @Column({ type: 'varchar' })
@@ -38,7 +38,7 @@ export class Application {
     @Column({ type: 'varchar' })
     contactNumber: string;
 
-    // Company info (aligns with Restaurant entity)
+    // Company info (aligns with Restaurant entity) //TODO: Maybe add registeredCountry as enum? 
     @Column({ type: 'varchar' })
     registeredCountry: string;
 

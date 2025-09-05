@@ -27,7 +27,7 @@ export class FileuploadController {
     constructor(private readonly fileUploadService: FileUploadService) { }
 
     @Post('profile')
-    @UseInterceptors(getFileInterceptor(UploadFolder.PROFILE))
+    @UseInterceptors(getFileInterceptor('file', UploadFolder.PROFILE))
     @UseFilters(MulterExceptionFilter) // handles Multer errors
     @ApiConsumes('multipart/form-data')
     @ApiOperation({ summary: 'Upload profile picture' })
@@ -67,7 +67,7 @@ export class FileuploadController {
     }
 
     @Post('application')
-    @UseInterceptors(getFileInterceptor(UploadFolder.APPLICATIONS))
+    @UseInterceptors(getFileInterceptor('file',UploadFolder.APPLICATIONS))
     @UseFilters(MulterExceptionFilter) // handles Multer errors
     @ApiConsumes('multipart/form-data')
     @ApiOperation({ summary: 'Upload application document' })
