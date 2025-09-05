@@ -1,0 +1,1 @@
+export const defaultFileName = 'default-file-name';
