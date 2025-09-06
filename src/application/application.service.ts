@@ -41,6 +41,7 @@ export class ApplicationService {
     return await this.applicationRepo.save(application);
   }
 
+  //TODO
   async findOne(id: string) {
     // fetch application + applicant safely
     const application = await this.applicationRepo.findOne({
