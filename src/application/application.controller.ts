@@ -23,6 +23,8 @@ import { defaultFileName } from 'src/common/types/default.type';
 import { JwtAuthGuard } from 'src/common/auth/AuthGuard';
 import { Roles } from 'src/common/auth/AuthRoles';
 import { getFilesInterceptor } from 'src/file-upload/file-upload.utils';
+import { Pagination, PaginationParams } from 'src/common/pagination/pagination.decorator';
+import { paginateResponse } from 'src/common/pagination/pagination.helper';
 
 @ApiTags('Applications')
 @UseGuards(JwtAuthGuard)
@@ -114,25 +116,30 @@ export class ApplicationController {
     };
   }
 
+  //get all applications
   @Get()
   @ApiOperation({ summary: 'Get all applications with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiResponse({ status: 200, description: 'Applications retrieved successfully' })
   async findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
+    @Pagination() pagination: PaginationParams,
+    @Req() req,
   ) {
-    const applications = await this.applicationService.findAll(Number(page), Number(limit));
+    const { page, limit } = pagination;
+    const { data, total } = await this.applicationService.findAll(page, limit);
+
+    const paginated = paginateResponse(data, total, page, limit, req);
+
     return {
       success: true,
       statusCode: 200,
       message: 'Applications retrieved successfully',
-      data: applications,
+      data: paginated,
     };
   }
 
-  //TODO: PAGINATION DECORATOR AND HELPER
+  //get single application by id
   @Get(':id')
   @ApiOperation({ summary: 'Get a single application by ID' })
   @ApiParam({ name: 'id', type: 'string', description: 'Application UUID' })
@@ -148,5 +155,8 @@ export class ApplicationController {
       data: application,
     };
   }
+
+  // TODO: get applications of logged in user
+
 
 }
