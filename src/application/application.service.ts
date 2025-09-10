@@ -35,7 +35,7 @@ export class ApplicationService {
       companyEmail: dto.companyEmail,
       companyPhone: dto.companyPhone,
       city: dto.city,
-      requiredDocuments: fileUrl, // file upload
+      requiredDocuments: fileUrl,
     });
 
     return await this.applicationRepo.save(application);
@@ -61,6 +61,39 @@ export class ApplicationService {
         email: applicant.email,
         role: applicant.role,
       },
+    };
+  }
+
+  async findAll(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: any[]; total: number; page: number; limit: number }> {
+    const [applications, total] = await this.applicationRepo.findAndCount({
+      relations: ['applicant'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { appliedAt: 'DESC' },
+    });
+
+    // sanitize applicant info
+    const sanitized = applications.map(app => {
+      const { applicant, ...rest } = app;
+      return {
+        ...rest,
+        applicant: {
+          id: applicant.id,
+          name: applicant.name,
+          email: applicant.email,
+          role: applicant.role,
+        },
+      };
+    });
+
+    return {
+      data: sanitized,
+      total,
+      page,
+      limit,
     };
   }
   
