@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
+  Query,
   Req,
   UploadedFile,
   UploadedFiles,
@@ -12,7 +15,7 @@ import {
 import { ApplicationService } from './application.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MulterExceptionFilter } from 'src/common/filters/multer-exception.filter';
 import { UploadFolder } from 'src/common/enums/file-upload.enum';
 import { userPayloadType } from 'src/common/types/auth.types';
@@ -107,6 +110,41 @@ export class ApplicationController {
       success: true,
       statusCode: 201,
       message: 'Application submitted successfully',
+      data: application,
+    };
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all applications with pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiResponse({ status: 200, description: 'Applications retrieved successfully' })
+  async findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    const applications = await this.applicationService.findAll(Number(page), Number(limit));
+    return {
+      success: true,
+      statusCode: 200,
+      message: 'Applications retrieved successfully',
+      data: applications,
+    };
+  }
+
+  //TODO: PAGINATION DECORATOR AND HELPER
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a single application by ID' })
+  @ApiParam({ name: 'id', type: 'string', description: 'Application UUID' })
+  @ApiResponse({ status: 200, description: 'Application retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'Application not found' })
+  async findOne(@Param('id') id: string) {
+    const application = await this.applicationService.findOne(id);
+
+    return {
+      success: true,
+      statusCode: 200,
+      message: 'Application retrieved successfully',
       data: application,
     };
   }

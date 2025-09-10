@@ -32,7 +32,7 @@ export class MailService {
                 subject: 'Verify your account',
                 title: 'Email Verification',
                 name,
-                otp: process.env.APP_ENV === 'production' ? otp : '123456',
+                otp,
                 action: 'verify your account',
                 expiry: 10, // minutes
             },
