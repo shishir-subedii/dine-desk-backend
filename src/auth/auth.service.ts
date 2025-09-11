@@ -35,6 +35,7 @@ export class AuthService {
         }
 
         const user = await this.userService.findCompleteProfileByEmail(email);
+        console.log('User fetched for login:', user);
         if (!user) {
             throw new BadRequestException('Invalid credentials');
         }
