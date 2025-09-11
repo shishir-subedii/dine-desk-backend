@@ -1,12 +1,12 @@
 export enum orderStatus {
-    PENDING = 'PENDING',          // Order placed, waiting for confirmation
-    ACCEPTED = 'ACCEPTED',        // Seller/restaurant accepted the order
-    PREPARING = 'PREPARING',      // Items being prepared
-    READY_FOR_PICKUP = 'READY_FOR_PICKUP', // Packed and ready for rider
-    PICKED_UP = 'PICKED_UP',      // Rider picked it up
-    OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY', // On the way
-    DELIVERED = 'DELIVERED',      // Successfully delivered
-    CANCELLED = 'CANCELLED',      // Cancelled at any stage
-    FAILED = 'FAILED',            // Payment/delivery failed (optional)
-    RETURNED = 'RETURNED',        // Customer returned item (e-commerce case)
+    PENDING = 'pending',          // Order placed, waiting for confirmation
+    ACCEPTED = 'accepted',        // Seller/restaurant accepted the order
+    PREPARING = 'preparing',      // Items being prepared
+    READY_FOR_PICKUP = 'ready_for_pickup', // Packed and ready for rider
+    PICKED_UP = 'picked_up',      // Rider picked it up
+    OUT_FOR_DELIVERY = 'out_for_delivery', // On the way
+    DELIVERED = 'delivered',      // Successfully delivered
+    CANCELLED = 'cancelled',      // Cancelled at any stage
+    FAILED = 'failed',            // Payment/delivery failed (optional)
+    RETURNED = 'returned',        // Customer returned item (e-commerce case)
 }

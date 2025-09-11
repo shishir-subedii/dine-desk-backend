@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -37,14 +38,14 @@ export class ApplicationController {
   ) { }
 
 
-  @Roles('user')
   @Post()
-    @UseInterceptors(
-      getFilesInterceptor([
-        { name: 'requiredDocuments', folder: UploadFolder.APPLICATIONS },
-        { name: 'logo', folder: UploadFolder.LOGOS },
-      ]),
-    )
+  @Roles('user')
+  @UseInterceptors(
+    getFilesInterceptor([
+      { name: 'requiredDocuments', folder: UploadFolder.APPLICATIONS },
+      { name: 'logo', folder: UploadFolder.LOGOS },
+    ]),
+  )
   @UseFilters(MulterExceptionFilter)
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Submit new application with documents & logo' })
@@ -110,7 +111,6 @@ export class ApplicationController {
 
     return {
       success: true,
-      statusCode: 201,
       message: 'Application submitted successfully',
       data: application,
     };
@@ -118,6 +118,7 @@ export class ApplicationController {
 
   //get all applications
   @Get()
+  @Roles('admin', 'superadmin')
   @ApiOperation({ summary: 'Get all applications with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
@@ -133,7 +134,6 @@ export class ApplicationController {
 
     return {
       success: true,
-      statusCode: 200,
       message: 'Applications retrieved successfully',
       data: paginated,
     };
@@ -141,6 +141,7 @@ export class ApplicationController {
 
   //get single application by id
   @Get(':id')
+  @Roles('admin', 'superadmin')
   @ApiOperation({ summary: 'Get a single application by ID' })
   @ApiParam({ name: 'id', type: 'string', description: 'Application UUID' })
   @ApiResponse({ status: 200, description: 'Application retrieved successfully' })
@@ -150,13 +151,40 @@ export class ApplicationController {
 
     return {
       success: true,
-      statusCode: 200,
       message: 'Application retrieved successfully',
       data: application,
     };
   }
 
   // TODO: get applications of logged in user
+  @Get('me/applications')
+  @Roles('user')
+  @ApiOperation({ summary: 'Get applications of logged in user' })
+  @ApiResponse({ status: 200, description: 'Applications retrieved successfully' })
+  async findMyApplications(@Req() req) {
+    const user = req['user'] as userPayloadType;
+    const applications = await this.applicationService.findByUserId(user.id);
 
+    return {
+      success: true,
+      message: 'Applications retrieved successfully',
+      data: applications,
+    };
+  }
 
+  //patch --> approve application. 
+  @Patch(':id/approve')
+  @Roles('admin', 'superadmin')
+  @ApiOperation({ summary: 'Approve an application by ID' })
+  @ApiParam({ name: 'id', type: 'string', description: 'Application UUID' })
+  @ApiResponse({ status: 200, description: 'Application approved and restaurant created successfully' })
+  async approveApplication(@Param('id') id: string, @Req() req) {
+    const staff = req['user'] as userPayloadType;
+    const result = await this.applicationService.approveApplication(id, staff.id);
+    return {
+      success: true,
+      message: 'Application approved and restaurant created successfully',
+      data: result,
+    };
+  }
 }

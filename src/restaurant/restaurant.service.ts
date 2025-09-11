@@ -1,26 +1,25 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Restaurant } from './entities/restaurant.entity';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
-import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { User } from 'src/user/entity/user.entity';
+import { Application } from 'src/application/entities/application.entity';
 
 @Injectable()
 export class RestaurantService {
-  create(createRestaurantDto: CreateRestaurantDto) {
-    return 'This action adds a new restaurant';
-  }
+  constructor(
+    @InjectRepository(Restaurant)
+    private readonly restaurantRepo: Repository<Restaurant>,
+  ) { }
 
-  findAll() {
-    return `This action returns all restaurant`;
-  }
+  async create(createRestaurantDto: CreateRestaurantDto, owner: User, application: Application) {
+    const restaurant = this.restaurantRepo.create({
+      ...createRestaurantDto,
+      owner,
+      application,
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} restaurant`;
-  }
-
-  update(id: number, updateRestaurantDto: UpdateRestaurantDto) {
-    return `This action updates a #${id} restaurant`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} restaurant`;
+    return await this.restaurantRepo.save(restaurant);
   }
 }

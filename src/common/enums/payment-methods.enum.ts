@@ -1,5 +1,5 @@
 export enum paymentMethods {
-    STRIPE = 'STRIPE',
-    ESEWA = 'ESEWA',
-    COD = 'COD'
+    STRIPE = 'stripe',
+    ESEWA = 'esewa',
+    COD = 'cod'
 }

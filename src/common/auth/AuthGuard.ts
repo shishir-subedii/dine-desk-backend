@@ -32,12 +32,15 @@ export class JwtAuthGuard implements CanActivate {
         }
 
         const token = authHeader.split(' ')[1];
+        console.log('Token:', token);
         try {
             const payload: { id: string; email: string; role: string } =
                 this.jwt.verify(token, {
                     secret: process.env.JWT_ACCESS_SECRET,
                 });
+                console.log('Payload:', payload);
             const user = await this.userService.findCompleteProfileByEmail(payload.email);
+            console.log('User:', user);
             if (!user || !user.accessTokens || !user.accessTokens.includes(token)) {
                 throw new UnauthorizedException('User not logged-in');
             }

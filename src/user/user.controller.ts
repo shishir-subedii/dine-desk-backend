@@ -1,11 +1,13 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiOperation, ApiResponse, ApiBearerAuth, ApiBadRequestResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiBearerAuth, ApiBadRequestResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/common/auth/AuthGuard';
 import { Request } from 'express';
 import { userPayloadType } from 'src/common/types/auth.types';
 
+@ApiTags('Users')
 @Controller('user')
+@UseGuards(JwtAuthGuard)
 export class UserController {
     constructor(
         private readonly userService: UserService
@@ -23,7 +25,6 @@ export class UserController {
         description: 'User not found',
     })
     @Get()
-    @UseGuards(JwtAuthGuard)
     async getProfile(@Req() req: Request) {
         const user = req['user'] as userPayloadType;
         const userProfile = await this.userService.getUserProfile(user.email);

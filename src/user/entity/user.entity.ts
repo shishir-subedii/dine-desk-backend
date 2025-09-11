@@ -28,6 +28,7 @@ export class User {
         type: 'text',
         array: true,
         nullable: true,
+        select: false,
         default: () => 'ARRAY[]::TEXT[]',
     })
     accessTokens: string[] | null;

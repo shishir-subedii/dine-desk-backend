@@ -218,9 +218,10 @@ export class UserService {
             .addSelect('user.password')
             .addSelect('user.accessTokens')
             .where('user.email = :email', { email })
-            .where('user.isVerified = :isVerified', { isVerified: true })
+            .andWhere('user.isVerified = :isVerified', { isVerified: true })
             .getOne();
     }
+
 
     // Add token to user's token array
     async addAccessToken(email: string, newToken: string) {

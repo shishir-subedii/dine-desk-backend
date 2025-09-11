@@ -24,6 +24,7 @@ export class CreateApplicationDto {
 
     @ApiProperty({ example: '+977-9812345678' })
     @IsString()
+    //TODO: ADD ISNUMBER VALIDATION LATER
     @IsNotEmpty()
     contactNumber: string;
 
