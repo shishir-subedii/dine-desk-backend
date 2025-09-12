@@ -22,4 +22,14 @@ export class RestaurantService {
 
     return await this.restaurantRepo.save(restaurant);
   }
+
+  async findMyRestaurants(ownerId: string): Promise<Restaurant[]> {
+    const restaurants = await this.restaurantRepo.find({
+      where: { owner: { id: ownerId } },
+      relations: ['owner', 'branches'],
+    });
+    console.log('Owner ID used:', ownerId);
+    console.log('Restaurants found:', restaurants.length);
+    return restaurants;
+  }
 }

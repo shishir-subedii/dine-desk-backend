@@ -7,6 +7,7 @@ import { Application } from './entities/application.entity';
 import { ApplicationStatus } from 'src/common/enums/application-status.enum';
 import { RestaurantService } from 'src/restaurant/restaurant.service';
 import { CreateRestaurantDto } from 'src/restaurant/dto/create-restaurant.dto';
+import { UserRole } from 'src/common/enums/auth-roles.enum';
 
 @Injectable()
 export class ApplicationService {
@@ -127,6 +128,11 @@ export class ApplicationService {
       application.reviewedAt = new Date();
       await queryRunner.manager.save(application);
 
+      // 🔑 update applicant role to restaurant_owner
+      const applicant = application.applicant;
+      applicant.role = UserRole.RESTAURANT_OWNER; 
+      await queryRunner.manager.save(applicant);
+
       // build restaurant DTO from application
       const createRestaurantDto: CreateRestaurantDto = {
         name: application.restaurantName,
@@ -141,14 +147,14 @@ export class ApplicationService {
 
       // use RestaurantService to create restaurant
       const restaurant = await this.restaurantService.create(
-        createRestaurantDto as CreateRestaurantDto,
-        application.applicant,
+        createRestaurantDto,
+        applicant,
         application,
       );
 
       await queryRunner.commitTransaction();
 
-      return { application, restaurant };
+      return { application, restaurant, applicant };
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
@@ -156,6 +162,7 @@ export class ApplicationService {
       await queryRunner.release();
     }
   }
+
 
   
 }
