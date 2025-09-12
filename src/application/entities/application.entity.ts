@@ -67,8 +67,8 @@ export class Application {
     })
     status: ApplicationStatus;
 
-    @Column({ type: 'varchar', nullable: true })
-    reviewedBy: string | null; // staff ID or name who reviewed
+    @ManyToOne(() => User, { nullable: true })
+    reviewedBy: User | null; // staff ID or name who reviewed
 
     @Column({ type: 'timestamptz', nullable: true })
     reviewedAt: Date | null;
