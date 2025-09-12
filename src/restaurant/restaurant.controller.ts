@@ -1,9 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Restaurant } from './entities/restaurant.entity';
 import { RestaurantService } from './restaurant.service';
-import { CreateRestaurantDto } from './dto/create-restaurant.dto';
-import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { JwtAuthGuard } from 'src/common/auth/AuthGuard';
+import { userPayloadType } from 'src/common/types/auth.types';
 
-@Controller('restaurant')
+@ApiTags('restaurants')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
+@Controller('restaurants')
 export class RestaurantController {
-  constructor(private readonly restaurantService: RestaurantService) {}
+  constructor(private readonly restaurantService: RestaurantService) { }
+
+  //TODO: more to do
+  @Get('my-restaurants')
+  @ApiOperation({ summary: 'Get all restaurants for the authenticated user' })
+  async findMyRestaurants(@Req() req: Request){
+    const user = req['user'] as userPayloadType;
+    const data = await this.restaurantService.findMyRestaurants(user.id);
+    return {
+      success: true,
+      data,
+      message: 'Restaurants fetched successfully',
+    }
+  }
 }
