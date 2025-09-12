@@ -12,16 +12,16 @@ import { userPayloadType } from 'src/common/types/auth.types';
 export class RestaurantController {
   constructor(private readonly restaurantService: RestaurantService) { }
 
-  //TODO: more to do
+  //TODO: more to do add pagination
   @Get('my-restaurants')
   @ApiOperation({ summary: 'Get all restaurants for the authenticated user' })
   async findMyRestaurants(@Req() req: Request){
     const user = req['user'] as userPayloadType;
-    const data = await this.restaurantService.findMyRestaurants(user.id);
+    const data = await this.restaurantService.findMyRestaurant(user.id);
     return {
       success: true,
       data,
-      message: 'Restaurants fetched successfully',
+      message: 'Restaurant fetched successfully',
     }
   }
 }

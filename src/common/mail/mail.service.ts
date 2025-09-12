@@ -49,7 +49,7 @@ export class MailService {
                 subject: 'Password Reset',
                 title: 'Forgot Password Request',
                 name,
-                otp: process.env.APP_ENV === 'production' ? otp : '123456',
+                otp,
                 action: 'reset your password',
                 expiry: 10, // minutes
             },
