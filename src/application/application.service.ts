@@ -71,7 +71,7 @@ export class ApplicationService {
     // fetch application + applicant safely
     const application = await this.applicationRepo.findOne({
       where: { id },
-      relations: ['applicant'],
+      relations: ['applicant', 'reviewedBy'],
     });
 
     if (!application) throw new NotFoundException('Application not found');
@@ -82,10 +82,10 @@ export class ApplicationService {
   async findByUserId(userId: string) {
     const applications = await this.applicationRepo.find({
       where: { applicant: { id: userId } },
-      relations: ['applicant'],
+      relations: ['applicant', 'reviewedBy'],
       order: { appliedAt: 'DESC' },
     });
-    if(!applications || applications.length === 0) {
+    if (!applications || applications.length === 0) {
       throw new NotFoundException('No applications found for this user');
     }
     return applications;
@@ -110,7 +110,7 @@ export class ApplicationService {
     };
   }
 
-  async approveApplication(id: string, staffId: string) {
+  async approveApplication(id: string, adminId: string) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -121,10 +121,13 @@ export class ApplicationService {
         relations: ['applicant'],
       });
       if (!application) throw new NotFoundException('Application not found or already processed');
+      const admin = await queryRunner.manager.findOne(User, { where: { id: adminId } });
+      if (!admin) throw new NotFoundException('Admin not found');
+
+      application.reviewedBy = admin;
 
       // update application status
       application.status = ApplicationStatus.APPROVED;
-      application.reviewedBy = staffId;
       application.reviewedAt = new Date();
       await queryRunner.manager.save(application);
 
