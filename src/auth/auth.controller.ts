@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiResponse, ApiBadRequestResponse, ApiBody, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { UserRegisterDto } from './dto/UserRegisterDto';
@@ -6,10 +6,12 @@ import { UserLoginDto } from './dto/UserLoginDto';
 import { JwtAuthGuard } from 'src/common/auth/AuthGuard';
 import { changePasswordDto } from './dto/ChangePasswordDto';
 import { VerifyOtpDto } from './dto/VerifyOtp.dto';
+import { userPayloadType } from 'src/common/types/auth.types';
+import { LogOutAllDto } from './dto/LogoutAll.Dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   /*
   Register new user
@@ -125,6 +127,29 @@ export class AuthController {
   }
 
   /*
+  Logout from all sessions 
+  Take password in body and token in header
+  */
+  @Patch('logout-all')
+  @ApiOperation({ summary: 'Logout user from all sessions' })
+  @ApiBearerAuth()
+  @ApiBadRequestResponse({
+    description: 'User not found',
+  })
+  @ApiBody({
+    type: LogOutAllDto,
+  })
+  @UseGuards(JwtAuthGuard)
+  async logoutAll(@Req() req: Request, @Body() body: LogOutAllDto) {
+    const user = req['user'] as userPayloadType;
+    await this.authService.logoutAllSessions(user.email, body.password);
+    return {
+      success: true,
+      message: 'User logged out from all sessions successfully',
+    };
+  }
+
+  /*
   Change user password
   */
   @ApiOperation({ summary: 'Change user password' })
@@ -142,7 +167,7 @@ export class AuthController {
   @Post('change-password')
   @UseGuards(JwtAuthGuard)
   async changePassword(@Req() req: Request, @Body() body: changePasswordDto) {
-    const user = req['user'] as {email: string};
+    const user = req['user'] as userPayloadType;
     const updatedUser = await this.authService.changePassword(user.email, body);
     return {
       // success: true,

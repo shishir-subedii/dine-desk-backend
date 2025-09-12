@@ -77,6 +77,21 @@ export class AuthService {
         await this.userService.removeAccessToken(email, token);
     }
 
+    async logoutAllSessions(email: string, password: string) {
+        const user = await this.userService.findCompleteProfileByEmail(email);
+        if (!user) {
+            throw new BadRequestException('User not found');
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password!);
+        if (!isPasswordValid) {
+            throw new BadRequestException('Invalid password');
+        }
+
+        await this.userService.removeAllAccessTokens(email);
+    }
+
+
     async genTokens(id: string, email: string, role: string) {
         const accessToken = this.jwt.sign(
             { id, email, role },
