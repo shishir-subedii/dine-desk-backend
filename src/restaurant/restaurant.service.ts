@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Restaurant } from './entities/restaurant.entity';
@@ -23,13 +23,14 @@ export class RestaurantService {
     return await this.restaurantRepo.save(restaurant);
   }
 
-  async findMyRestaurants(ownerId: string): Promise<Restaurant[]> {
-    const restaurants = await this.restaurantRepo.find({
+  async findMyRestaurant(ownerId: string) {
+    const restaurants = await this.restaurantRepo.findOne({
       where: { owner: { id: ownerId } },
       relations: ['owner', 'branches'],
     });
-    console.log('Owner ID used:', ownerId);
-    console.log('Restaurants found:', restaurants.length);
+    if (!restaurants) {
+      throw new NotFoundException('No restaurant found for this user');
+    }
     return restaurants;
   }
 }
