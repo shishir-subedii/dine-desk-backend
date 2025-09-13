@@ -26,6 +26,7 @@ import { Roles } from 'src/common/auth/AuthRoles';
 import { getFilesInterceptor } from 'src/file-upload/file-upload.utils';
 import { Pagination, PaginationParams } from 'src/common/pagination/pagination.decorator';
 import { paginateResponse } from 'src/common/pagination/pagination.helper';
+import { RejectApplicationDto } from './dto/reject-application.dto';
 
 @ApiTags('Applications')
 @UseGuards(JwtAuthGuard)
@@ -179,11 +180,28 @@ export class ApplicationController {
   @ApiParam({ name: 'id', type: 'string', description: 'Application UUID' })
   @ApiResponse({ status: 200, description: 'Application approved and restaurant created successfully' })
   async approveApplication(@Param('id') id: string, @Req() req) {
-    const staff = req['user'] as userPayloadType;
-    const result = await this.applicationService.approveApplication(id, staff.id);
+    const admin = req['user'] as userPayloadType;
+    const result = await this.applicationService.approveApplication(id, admin.id);
     return {
       success: true,
       message: 'Application approved and restaurant created successfully',
+      data: result,
+    };
+  }
+
+  //Patch --> reject application.
+  @Patch(':id/reject')
+  @Roles('admin', 'superadmin')
+  @ApiOperation({ summary: 'Reject an application by ID' })
+  @ApiBody({ type: RejectApplicationDto })
+  @ApiParam({ name: 'id', type: 'string', description: 'Application UUID' })
+  @ApiResponse({ status: 200, description: 'Application rejected successfully' })
+  async rejectApplication(@Param('id') id: string, @Req() req, @Body() dto: RejectApplicationDto) {
+    const admin = req['user'] as userPayloadType;
+    const result = await this.applicationService.rejectApplication(id, admin.id, dto.reason);
+    return {
+      success: true,
+      message: 'Application rejected successfully',
       data: result,
     };
   }
