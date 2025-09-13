@@ -24,7 +24,6 @@ export class CreateApplicationDto {
 
     @ApiProperty({ example: '+977-9812345678' })
     @IsString()
-    //TODO: ADD ISNUMBER VALIDATION LATER
     @IsNotEmpty()
     contactNumber: string;
 
@@ -52,5 +51,18 @@ export class CreateApplicationDto {
     @IsNotEmpty()
     city: string;
 
-    // No file fields here!
+    // --- New fields ---
+    @ApiProperty({ example: '5th floor, near main gate' })
+    @IsString()
+    @IsNotEmpty()
+    addressDescription: string;
+
+    @ApiProperty({ example: 28.2096 })
+    @IsNotEmpty()
+    latitude: number;
+
+    @ApiProperty({ example: 83.9856 })
+    @IsNotEmpty()
+    longitude: number;
 }
+

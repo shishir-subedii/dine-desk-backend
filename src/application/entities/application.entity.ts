@@ -14,11 +14,9 @@ export class Application {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    // The user who submitted the application
     @ManyToOne(() => User, { nullable: false })
     applicant: User;
 
-    // Business info
     @Column({ type: 'varchar' })
     restaurantName: string;
 
@@ -26,9 +24,8 @@ export class Application {
     description: string | null;
 
     @Column({ type: 'varchar' })
-    logo: string; // can store logo even during application
+    logo: string;
 
-    // Contact info
     @Column({ type: 'varchar' })
     contactPersonName: string;
 
@@ -38,7 +35,6 @@ export class Application {
     @Column({ type: 'varchar' })
     contactNumber: string;
 
-    // Company info (aligns with Restaurant entity) //TODO: Maybe add registeredCountry as enum? 
     @Column({ type: 'varchar' })
     registeredCountry: string;
 
@@ -51,15 +47,22 @@ export class Application {
     @Column({ type: 'varchar' })
     companyPhone: string;
 
-    // City of operation (useful for assigning regional team)
     @Column({ type: 'varchar' })
     city: string;
 
-    // Legal / compliance
     @Column({ type: 'varchar' })
-    requiredDocuments: string; // maybe later make it a JSON or relation
+    requiredDocuments: string;
 
-    // Status tracking
+    // --- New fields ---
+    @Column({ type: 'varchar', length: 255 })
+    addressDescription: string;
+
+    @Column('decimal', { precision: 10, scale: 7 })
+    latitude: number;
+
+    @Column('decimal', { precision: 10, scale: 7 })
+    longitude: number;
+
     @Column({
         type: 'enum',
         enum: ApplicationStatus,
@@ -68,7 +71,7 @@ export class Application {
     status: ApplicationStatus;
 
     @ManyToOne(() => User, { nullable: true })
-    reviewedBy: User | null; // staff ID or name who reviewed
+    reviewedBy: User | null;
 
     @Column({ type: 'timestamptz', nullable: true })
     reviewedAt: Date | null;
@@ -82,3 +85,4 @@ export class Application {
     @UpdateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;
 }
+

@@ -27,6 +27,7 @@ import { getFilesInterceptor } from 'src/file-upload/file-upload.utils';
 import { Pagination, PaginationParams } from 'src/common/pagination/pagination.decorator';
 import { paginateResponse } from 'src/common/pagination/pagination.helper';
 import { RejectApplicationDto } from './dto/reject-application.dto';
+import { UserRole } from 'src/common/enums/auth-roles.enum';
 
 @ApiTags('Applications')
 @UseGuards(JwtAuthGuard)
@@ -40,7 +41,7 @@ export class ApplicationController {
 
 
   @Post()
-  @Roles('user')
+  @Roles(UserRole.USER)
   @UseInterceptors(
     getFilesInterceptor([
       { name: 'requiredDocuments', folder: UploadFolder.APPLICATIONS },
@@ -66,6 +67,11 @@ export class ApplicationController {
         companyPhone: { type: 'string', example: '+977-9800000000' },
         city: { type: 'string', example: 'Pokhara' },
 
+        // --- New fields ---
+        addressDescription: { type: 'string', example: '5th floor, near main gate' },
+        latitude: { type: 'number', example: 28.2096 },
+        longitude: { type: 'number', example: 83.9856 },
+
         requiredDocuments: { type: 'string', format: 'binary', description: 'PDF file' },
         logo: { type: 'string', format: 'binary', description: 'JPG/PNG logo' },
       },
@@ -79,10 +85,14 @@ export class ApplicationController {
         'companyEmail',
         'companyPhone',
         'city',
+        'addressDescription',
+        'latitude',
+        'longitude',
         'requiredDocuments',
       ],
     },
   })
+
 
   async createApplication(
     @UploadedFiles()
@@ -119,7 +129,7 @@ export class ApplicationController {
 
   //get all applications
   @Get()
-  @Roles('admin', 'superadmin')
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @ApiOperation({ summary: 'Get all applications with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
@@ -142,7 +152,7 @@ export class ApplicationController {
 
   //get single application by id
   @Get(':id')
-  @Roles('admin', 'superadmin')
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @ApiOperation({ summary: 'Get a single application by ID' })
   @ApiParam({ name: 'id', type: 'string', description: 'Application UUID' })
   @ApiResponse({ status: 200, description: 'Application retrieved successfully' })
@@ -159,7 +169,7 @@ export class ApplicationController {
 
   // TODO: get applications of logged in user
   @Get('me/applications')
-  @Roles('user')
+  @Roles(UserRole.USER)
   @ApiOperation({ summary: 'Get applications of logged in user' })
   @ApiResponse({ status: 200, description: 'Applications retrieved successfully' })
   async findMyApplications(@Req() req) {
@@ -175,7 +185,7 @@ export class ApplicationController {
 
   //patch --> approve application. 
   @Patch(':id/approve')
-  @Roles('admin', 'superadmin')
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @ApiOperation({ summary: 'Approve an application by ID' })
   @ApiParam({ name: 'id', type: 'string', description: 'Application UUID' })
   @ApiResponse({ status: 200, description: 'Application approved and restaurant created successfully' })
@@ -191,7 +201,7 @@ export class ApplicationController {
 
   //Patch --> reject application.
   @Patch(':id/reject')
-  @Roles('admin', 'superadmin')
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @ApiOperation({ summary: 'Reject an application by ID' })
   @ApiBody({ type: RejectApplicationDto })
   @ApiParam({ name: 'id', type: 'string', description: 'Application UUID' })
