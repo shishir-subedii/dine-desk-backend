@@ -1,4 +1,3 @@
-import { Branch } from 'src/branch/entities/branch.entity';
 import { User } from 'src/user/entity/user.entity';
 import {
     Entity,
@@ -26,9 +25,6 @@ export class Order {
 
     @ManyToOne(() => Restaurant, { nullable: false })
     restaurant: Restaurant;
-
-    @ManyToOne(() => Branch, { nullable: false })
-    branch: Branch;
 
     @Column({ type: 'varchar' })
     phoneNumber: string;

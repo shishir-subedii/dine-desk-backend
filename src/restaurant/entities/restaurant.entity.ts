@@ -1,16 +1,7 @@
-import {
-    Entity,
-    Column,
-    PrimaryGeneratedColumn,
-    ManyToOne,
-    CreateDateColumn,
-    OneToMany,
-    UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { User } from 'src/user/entity/user.entity';
-import { Branch } from 'src/branch/entities/branch.entity';
 import { Application } from 'src/application/entities/application.entity';
-import { GenericMenu } from 'src/menu/entities/generic_menu.entity';
+import { MenuItem } from 'src/menu/entities/menu.entity';
 
 @Entity('restaurants')
 export class Restaurant {
@@ -32,8 +23,25 @@ export class Restaurant {
     @Column({ type: 'varchar' })
     requiredDocuments: string;
 
-    @OneToMany(() => GenericMenu, (menu) => menu.restaurant)
-    menuItems: GenericMenu[];
+    // All menu items now directly belong to restaurant
+    @OneToMany(() => MenuItem, (menuItem) => menuItem.restaurant)
+    menuItems: MenuItem[];
+
+    // Address fields directly in restaurant
+    @Column({ type: 'varchar', length: 255 })
+    addressDescription: string; // e.g. "5th floor, near main gate"
+
+    @Column('decimal', { precision: 10, scale: 7 })
+    latitude: number;
+
+    @Column('decimal', { precision: 10, scale: 7 })
+    longitude: number;
+
+    @Column()
+    city: string;
+
+    @Column()
+    phoneNumber: string;
 
     @Column({ type: 'varchar' })
     registeredCountry: string;
@@ -52,9 +60,6 @@ export class Restaurant {
 
     @ManyToOne(() => User, (user) => user.restaurantsOwned)
     owner: User;
-
-    @OneToMany(() => Branch, (branch) => branch.restaurant)
-    branches: Branch[];
 
     @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;

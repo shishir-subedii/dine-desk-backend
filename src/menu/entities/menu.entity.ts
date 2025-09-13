@@ -1,4 +1,3 @@
-import { Branch } from 'src/branch/entities/branch.entity';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
 import {
     Entity,
@@ -30,9 +29,6 @@ export class MenuItem {
 
     @Column({ type: 'boolean', default: true })
     isAvailable: boolean;
-
-    @ManyToOne(() => Branch, (branch) => branch.menuItems, { nullable: false })
-    branch: Branch;
 
     @Column({ type: 'int', default: 0 })
     sellCount: number;

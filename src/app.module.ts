@@ -9,7 +9,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { RestaurantModule } from './restaurant/restaurant.module';
-import { BranchModule } from './branch/branch.module';
 import { CoreModule } from './common/core/core.module';
 import { MenuModule } from './menu/menu.module';
 import { OrderModule } from './order/order.module';
@@ -41,7 +40,6 @@ import { FileUploadModule } from './file-upload/file-upload.module';
     AppConfigModule,
     JwtmoduleModule,
     RestaurantModule,
-    BranchModule,
     CoreModule,
     MenuModule,
     OrderModule,
