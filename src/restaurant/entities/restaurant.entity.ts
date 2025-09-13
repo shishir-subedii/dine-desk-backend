@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDat
 import { User } from 'src/user/entity/user.entity';
 import { Application } from 'src/application/entities/application.entity';
 import { MenuItem } from 'src/menu/entities/menu.entity';
+import { Staff } from './staff.entity';
 
 @Entity('restaurants')
 export class Restaurant {
@@ -36,6 +37,9 @@ export class Restaurant {
 
     @Column('decimal', { precision: 10, scale: 7 })
     longitude: number;
+
+    @OneToMany(() => Staff, (staff) => staff.restaurant)
+    staff: Staff[];
 
     @Column()
     city: string;

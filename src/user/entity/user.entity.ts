@@ -9,6 +9,7 @@ import {
 
 import { UserRole } from 'src/common/enums/auth-roles.enum';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
+import { Staff } from 'src/restaurant/entities/staff.entity';
 
 @Entity('users')
 export class User {
@@ -35,6 +36,9 @@ export class User {
 
     @OneToMany(() => Restaurant, (restaurant) => restaurant.owner)
     restaurantsOwned: Restaurant[];
+    
+    @OneToMany(() => Staff, (staff) => staff.user)
+    staffAssignments: Staff[];
 
     @Column({ type: 'varchar', nullable: true })
     phoneNumber: string | null;

@@ -60,6 +60,9 @@ export class ApplicationService {
       companyEmail: dto.companyEmail,
       companyPhone: dto.companyPhone,
       city: dto.city,
+      addressDescription: dto.addressDescription,
+      latitude: dto.latitude,
+      longitude: dto.longitude,
       requiredDocuments: fileUrl,
     });
 
@@ -149,7 +152,15 @@ export class ApplicationService {
         registeredAddress: application.registeredAddress,
         companyEmail: application.companyEmail,
         companyPhone: application.companyPhone,
+        city: application.city,
+
+        // --- new fields ---
+        addressDescription: application.addressDescription,
+        latitude: application.latitude,
+        longitude: application.longitude,
+        phoneNumber: application.contactNumber,
       };
+
 
       // use RestaurantService to create restaurant
       const restaurant = await this.restaurantService.create(
