@@ -117,7 +117,10 @@ export class ApplicationService {
 
     try {
       const application = await queryRunner.manager.findOne(Application, {
-        where: { id, status: ApplicationStatus.PENDING },
+        where: {
+          id,
+          status: In([ApplicationStatus.PENDING, ApplicationStatus.HOLD])
+        },
         relations: ['applicant'],
       });
       if (!application) throw new NotFoundException('Application not found or already processed');
@@ -176,6 +179,32 @@ export class ApplicationService {
     }
   }
 
+  //Reject application
+  async rejectApplication(id: string, adminId: string, reason?: string) {
+    const application = await this.applicationRepo.findOne({
+      where: { id, status: ApplicationStatus.PENDING },
+      relations: ['applicant'],
+    });
+    if (!application) throw new NotFoundException('Application not found or already processed');
+    const admin = await this.userRepo.findOne({ where: { id: adminId } });
+    if (!admin) throw new NotFoundException('Admin not found'
+    );
+    application.reviewedBy = admin;
+    application.status = ApplicationStatus.REJECTED;
+    application.reviewedAt = new Date();
+    await this.applicationRepo.save(application);
+    await this.mailService.sendCustomMail(
+      application.applicant.email,
+      'Your Restaurant Application has been Rejected',
+      `<p>Dear ${application.applicant.name || 'Applicant'},</p>
+    <p>We regret to inform you that your application
+    for <b>${application.restaurantName}</b> has been <b>rejected</b>.</p>
+    <p>Reason: ${reason || 'Not specified'}</p>
+    <p>You may contact our support team for further assistance.</p>
+    <p>Thank you for considering DineDesk.</p>`
+    );
+    return application;
+  }
 
-
+  //TODO: hold application
 }

@@ -9,10 +9,8 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-
-//These are branch specific menu items
-@Entity('menu_items')
-export class MenuItem {
+@Entity('generic_menu_items')
+export class GenericMenu {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -31,13 +29,13 @@ export class MenuItem {
     @Column({ type: 'boolean', default: true })
     isAvailable: boolean;
 
-    @ManyToOne(() => Branch, (branch) => branch.menuItems, { nullable: false })
-    branch: Branch;
-
     @Column({ type: 'int', default: 0 })
     sellCount: number;
 
-    @ManyToOne(() => Restaurant, { nullable: false })
+    @ManyToOne(() => Restaurant, (restaurant) => restaurant.menuItems, {
+        nullable: false,
+        onDelete: 'CASCADE',
+    })
     restaurant: Restaurant;
 
     // Discount-specific

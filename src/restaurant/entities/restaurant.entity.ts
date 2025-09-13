@@ -10,6 +10,7 @@ import {
 import { User } from 'src/user/entity/user.entity';
 import { Branch } from 'src/branch/entities/branch.entity';
 import { Application } from 'src/application/entities/application.entity';
+import { GenericMenu } from 'src/menu/entities/generic_menu.entity';
 
 @Entity('restaurants')
 export class Restaurant {
@@ -30,6 +31,9 @@ export class Restaurant {
 
     @Column({ type: 'varchar' })
     requiredDocuments: string;
+
+    @OneToMany(() => GenericMenu, (menu) => menu.restaurant)
+    menuItems: GenericMenu[];
 
     @Column({ type: 'varchar' })
     registeredCountry: string;
