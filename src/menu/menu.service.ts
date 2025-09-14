@@ -103,4 +103,22 @@ export class MenuService {
     await this.checkAccess(menuItem.restaurant.id, person);
     return menuItem;
   }
+
+  //delete menu item by id
+  async deleteMenuById(id: string, person: userPayloadType) {
+    const menuItem = await this.menuRepo.findOne({
+      where: { id },
+      relations: ['restaurant', 'restaurant.owner'],
+    });
+    if (!menuItem) {
+      throw new NotFoundException('Menu item not found');
+    }
+    await this.checkAccess(menuItem.restaurant.id, person);
+    await this.menuRepo.remove(menuItem);
+    return { message: 'Menu item deleted successfully' };
+  }
+
+  //TODO: update menu item by id
+
+
 }
