@@ -1,3 +1,4 @@
+import { MenuItemCategory } from 'src/common/enums/menu-category.enum';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
 import {
     Entity,
@@ -23,6 +24,9 @@ export class MenuItem {
 
     @Column('decimal', { precision: 10, scale: 2 })
     price: number;
+
+    @Column({ type: 'enum', enum: MenuItemCategory, nullable: true })
+    category: MenuItemCategory | null;
 
     @Column({ type: 'varchar', nullable: true })
     imageUrl: string | null;

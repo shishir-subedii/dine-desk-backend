@@ -38,7 +38,7 @@ export class User {
     restaurantsOwned: Restaurant[];
     
     @OneToMany(() => Staff, (staff) => staff.user)
-    staffAssignments: Staff[];
+    staffAssignments: Staff;
 
     @Column({ type: 'varchar', nullable: true })
     phoneNumber: string | null;

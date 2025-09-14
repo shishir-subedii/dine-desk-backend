@@ -5,6 +5,7 @@ export const allowedMimeTypes: Record<UploadFolder, string[]> = {
     [UploadFolder.APPLICATIONS]: ['application/pdf'],
     [UploadFolder.COMMON]: ['image/jpeg', 'image/png', 'application/pdf'],
     [UploadFolder.LOGOS]: ['image/jpeg', 'image/jpg', 'image/png'],
+    [UploadFolder.MENUS]: ['image/jpeg', 'image/png', 'image/jpg'],
 };
 
 // file-upload.config.ts
