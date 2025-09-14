@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Restaurant } from './entities/restaurant.entity';
 import { RestaurantService } from './restaurant.service';
@@ -7,7 +7,7 @@ import { userPayloadType } from 'src/common/types/auth.types';
 import { Roles } from 'src/common/auth/AuthRoles';
 import { UserRole } from 'src/common/enums/auth-roles.enum';
 import { StaffRole } from 'src/common/enums/staff-role.enum';
-import { CreateStaffDto } from './dto/create-staff.dto';
+import { CreateStaffDto, findStaffByEmailDto } from './dto/staff.dto';
 
 @ApiTags('restaurants')
 @UseGuards(JwtAuthGuard)
@@ -21,7 +21,7 @@ export class RestaurantController {
   @Get('my-restaurants')
   @Roles(UserRole.RESTAURANT_OWNER)
   @ApiOperation({ summary: 'Get all restaurants for the authenticated user' })
-  async findMyRestaurants(@Req() req: Request){
+  async findMyRestaurants(@Req() req: Request) {
     const user = req['user'] as userPayloadType;
     const data = await this.restaurantService.findMyRestaurant(user.id);
     return {
@@ -48,7 +48,7 @@ export class RestaurantController {
     const data = await this.restaurantService.createStaff(
       owner.id,          // ownerId (logged-in user)
       restaurantId,      // which restaurant to add staff to
-      dto.userId,        // which user to assign as staff
+      dto.userEmail,        // which user to assign as staff
       dto.role,          // role of staff
     );
 
@@ -59,5 +59,50 @@ export class RestaurantController {
     };
   }
 
+  @Get('staff/all')
+  @Roles(UserRole.RESTAURANT_OWNER)
+  @ApiOperation({ summary: 'Find all staffs for owner’s restaurant' })
+  @ApiResponse({ status: 200, description: 'List of staffs returned' })
+  async findAllStaffs(@Req() req: Request) {
+    const owner = req['user'] as userPayloadType;
+    const data = await this.restaurantService.findAllStaffs(owner.id);
 
+    return { success: true, data, message: 'Staffs fetched successfully' };
+  }
+
+  @Get('staff/:staffId')
+  @Roles(UserRole.RESTAURANT_OWNER)
+  @ApiOperation({ summary: 'Find one staff by staffId' })
+  @ApiParam({
+    name: 'staffId',
+    type: 'string',
+    description: 'ID of the staff',
+  })
+  @ApiResponse({ status: 200, description: 'Staff details returned' })
+  async findOneStaff(
+    @Param('staffId') staffId: string,
+    @Req() req: Request,
+  ) {
+    const owner = req['user'] as userPayloadType;
+    const data = await this.restaurantService.findOneStaff(owner.id, staffId);
+
+    return { success: true, data, message: 'Staff fetched successfully' };
+  }
+
+  @Delete('staff/remove')
+  @Roles(UserRole.RESTAURANT_OWNER)
+  @ApiOperation({ summary: 'Remove staff by email' })
+  @ApiResponse({ status: 200, description: 'Staff removed successfully' })
+  async removeStaff(@Body() dto: findStaffByEmailDto, @Req() req: Request) {
+    const owner = req['user'] as userPayloadType;
+    const data = await this.restaurantService.removeStaff(
+      owner.id,
+      dto.staffEmail,
+    );
+
+    return { success: true, data, message: 'Staff removed successfully' };
+  }
 }
+
+
+

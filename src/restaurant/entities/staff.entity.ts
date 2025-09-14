@@ -1,5 +1,5 @@
 // staff.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { User } from 'src/user/entity/user.entity';
 import { Restaurant } from './restaurant.entity';
 import { StaffRole } from 'src/common/enums/staff-role.enum';
@@ -20,7 +20,4 @@ export class Staff {
         default: StaffRole.HELPER,
     })
     role: StaffRole;
-
-    @Column({ type: 'boolean', default: true })
-    isActive: boolean;
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { Restaurant } from './entities/restaurant.entity';
@@ -45,7 +45,7 @@ export class RestaurantService {
 
   //Staff end points
   //create staff
-  async createStaff(ownerId: string, restaurantId: string, userId: string, role: StaffRole) {
+  async createStaff(ownerId: string, restaurantId: string, userEmail: string, role: StaffRole) {
     return await this.dataSource.transaction(async (manager) => {
       const restaurant = await manager.getRepository(Restaurant).findOne({
         where: { id: restaurantId, owner: { id: ownerId } },
@@ -57,7 +57,7 @@ export class RestaurantService {
       }
 
       const user = await manager.getRepository(User).findOne({
-        where: { id: userId, role: UserRole.USER },
+        where: { email: userEmail, role: UserRole.USER },
       });
 
       if (!user) {
@@ -66,41 +66,89 @@ export class RestaurantService {
 
       // Create staff entry
       const staff = manager.getRepository(Staff).create({
-        user: { id: userId } as User,
+        user: { id: user.id } as User,
         restaurant: { id: restaurantId } as Restaurant,
         role,
       });
 
       // Update user role to STAFF
-      await manager.getRepository(User).update({ id: userId }, { role: UserRole.STAFF });
+      await manager.getRepository(User).update({ id: user.id }, { role: UserRole.STAFF });
 
       // Save staff record
       return await manager.getRepository(Staff).save(staff);
     });
   }
 
-  //remove staff
-  async removeStaff(ownerId: string, restaurantId: string, staffId: string) {
+  //find all staffs
+  async findAllStaffs(ownerId: string) {
     return await this.dataSource.transaction(async (manager) => {
-      const restaurant = await manager.getRepository(Restaurant).findOne({
-        where: { id: restaurantId, owner: { id: ownerId } },
-        relations: ['owner'],
-      });
+      const restaurant = await manager
+        .getRepository(Restaurant)
+        .findOne({
+          where: { owner: { id: ownerId } },
+          relations: ['staff', 'staff.user'],
+        });
       if (!restaurant) {
-        throw new NotFoundException('Restaurant not found or does not belong to the owner');
+        throw new NotFoundException('Restaurant not found');
       }
+      return restaurant.staff;
+    });
+  }
+
+  //find one staff
+  async findOneStaff(ownerId: string, staffId: string) {
+    return await this.dataSource.transaction(async (manager) => {
       const staff = await manager.getRepository(Staff).findOne({
-        where: { id: staffId, restaurant: { id: restaurantId } },
-        relations: ['user', 'restaurant'],
+        where: { id: staffId },
+        relations: ['user', 'restaurant', 'restaurant.owner'],
       });
+
       if (!staff) {
-        throw new NotFoundException('Staff not found for this restaurant');
+        throw new NotFoundException('Staff not found');
       }
+
+      // Verify restaurant belongs to the given owner
+      if (staff.restaurant.owner.id !== ownerId) {
+        throw new ForbiddenException(
+          'This restaurant does not belong to the owner',
+        );
+      }
+
+      return staff;
+    });
+  }
+
+  //remove staff
+  async removeStaff(ownerId: string, staffEmail: string) {
+    return await this.dataSource.transaction(async (manager) => {
+      // Find staff by user email (not by staff.id)
+      const staff = await manager.getRepository(Staff).findOne({
+        where: { user: { email: staffEmail } },
+        relations: ['user', 'restaurant', 'restaurant.owner'],
+      });
+
+      if (!staff) {
+        throw new NotFoundException('Staff not found');
+      }
+
+      // Verify restaurant belongs to the given owner
+      if (staff.restaurant.owner.id !== ownerId) {
+        throw new ForbiddenException(
+          'This restaurant does not belong to the owner',
+        );
+      }
+
       // Update user role back to USER
-      await manager.getRepository(User).update({ id: staff.user.id }, { role: UserRole.USER });
+      await manager.getRepository(User).update(
+        { id: staff.user.id },
+        { role: UserRole.USER },
+      );
+
       // Remove staff record
       await manager.getRepository(Staff).remove(staff);
+
       return { message: 'Staff removed successfully' };
     });
   }
+
 }
