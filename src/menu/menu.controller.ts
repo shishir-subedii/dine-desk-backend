@@ -12,6 +12,7 @@ import {
   ParseIntPipe,
   DefaultValuePipe,
   Param,
+  Delete,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -74,10 +75,9 @@ export class MenuController {
       data,
     }
   }
-  
+
   //get all menu items for a restaurant with pagination
   @Get('restaurant/:restaurantId')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get paginated menu items of a restaurant' })
   @ApiParam({ name: 'restaurantId', required: true, description: 'UUID of the restaurant' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
@@ -99,7 +99,6 @@ export class MenuController {
   }
 
   @Get(':id')
-  @ApiBearerAuth() // JWT auth
   @ApiOperation({ summary: 'Get a single menu item by ID' })
   @ApiParam({ name: 'id', required: true, description: 'UUID of the menu item' })
   @ApiResponse({ status: 200, description: 'Menu item retrieved successfully', type: MenuItem })
@@ -115,4 +114,19 @@ export class MenuController {
     };
   }
 
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a menu item by ID' })
+  @ApiParam({ name: 'id', required: true, description: 'UUID of the menu item to delete' })
+  @ApiResponse({ status: 200, description: 'Menu item deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Menu item not found' })
+  async deleteMenu(@Req() req, @Param('id') id: string) {
+    const user = req.user as userPayloadType;
+    const result = await this.menuService.deleteMenuById(id, user);
+
+    return {
+      success: true,
+      message: result.message,
+      data: null, // no data to return
+    };
+  }
 }
