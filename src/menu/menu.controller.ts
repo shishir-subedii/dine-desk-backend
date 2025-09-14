@@ -58,23 +58,29 @@ export class MenuController {
         restaurantId: { type: 'string', example: 'uuid-of-restaurant' },
         file: { type: 'string', format: 'binary' }, // This is the file input
       },
-      required: ['name', 'price', 'restaurantId', 'file'],
+      required: ['name', 'price', 'restaurantId'],
     },
   })
   async createMenu(
-    @UploadedFile() file: Express.Multer.File,
     @Body() dto: CreateMenuItemDto,
     @Req() req,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     const user = req.user as userPayloadType;
-    const fileUrl = await this.fileUploadService.getFileUrl(req, file, UploadFolder.MENUS);
+
+    const fileUrl = file
+      ? await this.fileUploadService.getFileUrl(req, file, UploadFolder.MENUS)
+      : 'https://default-not-found.jpg';
+
     const data = await this.menuService.createMenu(dto, fileUrl, user);
+
     return {
       success: true,
       message: 'Menu item created successfully',
       data,
-    }
+    };
   }
+
 
   //get all menu items for a restaurant with pagination
   @Get('restaurant/:restaurantId')
