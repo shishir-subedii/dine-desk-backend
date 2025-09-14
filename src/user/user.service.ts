@@ -209,7 +209,7 @@ export class UserService {
     }
 
     async findOneByEmail(email: string) {
-        return this.usersRepository.findOne({ where: { email, isVerified: true }, relations: { restaurantsOwned: true } });
+        return this.usersRepository.findOne({ where: { email, isVerified: true }, relations: { restaurantsOwned: true, staffAssignments: true } });
     }
 
     async findCompleteProfileByEmail(email: string) {
