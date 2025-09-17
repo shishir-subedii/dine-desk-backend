@@ -14,6 +14,7 @@ export class Payment {
     @Column({
         type: 'enum',
         enum: paymentMethods,
+        default: paymentMethods.COD,
     })
     method: paymentMethods;
 
